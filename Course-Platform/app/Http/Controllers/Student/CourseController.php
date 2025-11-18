@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Lesson;
 use Illuminate\Http\Request;
+use App\Models\LessonUserProgress;
 
 class CourseController extends Controller
 {
@@ -33,50 +34,95 @@ class CourseController extends Controller
         return redirect()->route('student.courses.learn', $course)
             ->with('success', 'Berhasil mendaftar course.');
     }
-   public function index(Request $request)
-    {
-        $user = $request->user();
+  public function index(Request $request)
+{
+    $user = $request->user();
 
-        // --- Pilihan 1: kalau kamu punya relasi khusus di User, misalnya:
-        // public function enrolledCourses() { return $this->belongsToMany(Course::class, 'course_student'); }
-        if (method_exists($user, 'enrolledCourses')) {
-            $courses = $user->enrolledCourses()
-                ->with('category')   // kalau ada relasi
-                ->latest()
-                ->get();
+    if (method_exists($user, 'enrolledCourses')) {
+        $courses = $user->enrolledCourses()
+            ->with(['category', 'modules.lessons'])   // load category + semua modul & lesson
+            ->latest()
+            ->get();
+    } else {
+        $courses = Course::whereHas('students', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->with(['category', 'modules.lessons'])
+            ->latest()
+            ->get();
+    }
+
+    // Hitung progress untuk tiap course
+    foreach ($courses as $course) {
+        $lessonIds = $course->modules
+            ->flatMap(fn ($m) => $m->lessons)
+            ->pluck('id')
+            ->values();
+
+        $totalLessons = $lessonIds->count();
+
+        if ($totalLessons > 0) {
+            $doneLessons = LessonUserProgress::where('user_id', $user->id)
+                ->whereIn('lesson_id', $lessonIds)
+                ->where('is_done', true)
+                ->count();
+
+            $course->progress_percent = (int) round($doneLessons / $totalLessons * 100);
         } else {
-            // --- Pilihan 2: fallback pakai pivot course_student ---
-            $courses = Course::whereHas('students', function ($q) use ($user) {
-                    $q->where('user_id', $user->id);
-                })
-                ->with('category')
-                ->latest()
-                ->get();
+            $course->progress_percent = 0;
         }
 
-        return view('student.courses.index', [
-            'courses' => $courses,
-        ]);
+        // Biar gampang dipakai di Blade:
+        $course->is_completed = (bool) ($course->pivot->is_completed ?? false);
     }
+
+    return view('student.courses.index', [
+        'courses' => $courses,
+    ]);
+}
+
 
     public function learn(Request $request, Course $course)
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
 
-        abort_unless($user->enrolledCourses->contains($course->id), 403);
+    // pastikan user sudah enroll course ini
+    abort_unless($user->enrolledCourses->contains($course->id), 403);
 
-        $course->load('modules.lessons.contents');
+    // load modul + lesson + contents
+    $course->load('modules.lessons.contents');
 
-        // optional: pilih lesson aktif dari query ?lesson=
-        $currentLesson = null;
+    // kumpulkan semua lesson dalam course ini
+    $allLessons = $course->modules
+        ->flatMap(fn ($m) => $m->lessons)
+        ->values();
+
+    $lessonIds = $allLessons->pluck('id')->values();
+
+    // ambil id lesson yang SUDAH SELESAI untuk user ini
+    $doneLessonIds = LessonUserProgress::where('user_id', $user->id)
+        ->whereIn('lesson_id', $lessonIds)
+        ->where('is_done', true)
+        ->pluck('lesson_id')
+        ->toArray();
+
+    // pilih lesson aktif dari query ?lesson=
+    $currentLesson = null;
     if ($lessonId = $request->query('lesson')) {
-        $currentLesson = Lesson::where('id', $lessonId)
-            ->whereHas('module', function ($q) use ($course) {
-                $q->where('course_id', $course->id);
-            })
-            ->first();
-        }
-
-        return view('student.courses.learn', compact('course','currentLesson'));
+        $currentLesson = $allLessons->firstWhere('id', (int) $lessonId);
     }
+
+    // fallback: kalau tidak ada / id tidak cocok → pakai lesson pertama
+    if (! $currentLesson) {
+        $currentLesson = $allLessons->first();
+    }
+
+    return view('student.courses.learn', [
+        'course'        => $course,
+        'currentLesson' => $currentLesson,
+        'doneLessonIds' => $doneLessonIds,
+    ]);
+}
+
+
 }

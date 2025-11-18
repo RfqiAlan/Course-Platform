@@ -4,7 +4,7 @@
             
             {{-- ========================= --}}
             {{-- SIDEBAR KIRI (MODUL & LESSON) --}}
-            {{-- ========================= --}}
+            {{-- ========================= --}} 
             <div class="col-lg-3">
                 <div class="card border-0 shadow-sm rounded-4" style="position: sticky; top: 80px;">
                     <div class="card-body p-3">
@@ -19,20 +19,37 @@
 
                                 <ul class="list-unstyled ms-3 mt-2">
                                     @foreach($m->lessons as $l)
-                                        @php
-                                            $active = isset($currentLesson) && $l->id === $currentLesson->id;
-                                        @endphp
+    @php
+        $active = isset($currentLesson) && $l->id === $currentLesson->id;
+        $isDone = isset($doneLessonIds) && in_array($l->id, $doneLessonIds);
+    @endphp
 
-                                        <li class="mb-1">
-                                            <a href="{{ route('student.courses.learn', [$course->id, 'lesson' => $l->id]) }}"
-                                               class="d-flex align-items-center p-2 rounded-3 small
-                                               {{ $active ? 'bg-primary text-white fw-semibold' : 'bg-light text-dark' }}"
-                                               style="text-decoration:none;">
-                                                <i class="bi bi-play-circle me-2"></i> 
-                                                <span class="text-truncate">{{ $l->title }}</span>
-                                            </a>
-                                        </li>
-                                    @endforeach
+    <li class="mb-1">
+        <a href="{{ route('student.courses.learn', [$course->id, 'lesson' => $l->id]) }}"
+           class="d-flex align-items-center p-2 rounded-3 small
+           @if($active)
+                bg-primary text-white fw-semibold
+           @elseif($isDone)
+                bg-success-subtle text-success border border-success
+           @else
+                bg-light text-dark
+           @endif"
+           style="text-decoration:none; border-left: 4px solid {{ $isDone ? '#198754' : 'transparent' }};">
+           
+            {{-- titik hijau kecil di kiri kalau sudah selesai --}}
+            @if($isDone)
+                <span class="me-2 rounded-circle" 
+                      style="width:8px; height:8px; background-color:#198754;"></span>
+            @else
+                <span class="me-2" style="width:8px; height:8px;"></span>
+            @endif
+
+            <i class="bi bi-play-circle me-2"></i> 
+            <span class="text-truncate">{{ $l->title }}</span>
+        </a>
+    </li>
+@endforeach
+
                                 </ul>
                             </div>
                         @endforeach

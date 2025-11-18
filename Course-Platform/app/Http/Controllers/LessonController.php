@@ -25,16 +25,13 @@ class LessonController extends Controller
             ]
         );
 
-        // 2. Ambil course terkait
-        $course = $lesson->module->course;
+         // 2. Ambil course terkait + semua lesson (pakai relasi yang sudah ada)
+        $course = $lesson->module->course->load('modules.lessons');
 
-        // 3. Ambil semua lesson id dalam course tsb
-        $lessonIds = $course->modules()
-            ->with('lessons:id,module_id')
-            ->get()
-            ->pluck('lessons.*.id')
-            ->flatten()
-            ->filter()
+        // 3. Semua lesson id dalam course tsb
+        $lessonIds = $course->modules
+            ->flatMap(fn ($m) => $m->lessons)
+            ->pluck('id')
             ->values();
 
         $totalLessons = $lessonIds->count();
