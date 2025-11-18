@@ -36,17 +36,19 @@ use App\Http\Controllers\QuizController;
 // ==============================
 use Barryvdh\DomPDF\Facade\Pdf;
 
-Route::get('/test-pdf', function () {
-    $data = [
-        'name' => 'Tes PDF',
-        'course' => 'Laravel Course',
+
+Route::get('/test-sertifikat', function () {
+
+    $pdf = Pdf::loadView('certificates.template', [
+        'user' => (object)['name' => 'Rifqi Alan Maulana'],
+        'course' => (object)['title' => 'Laravel Mastery Bootcamp'],
         'date' => now()->format('d F Y'),
-    ];
+        'code' => 'CERT-TEST-123',
+    ]);
 
-    $pdf = Pdf::loadView('test-pdf', $data);
-
-    return $pdf->download('test.pdf');
+    return $pdf->download('sertifikat-uji.pdf');
 });
+
 
 // Beranda (Livewire page)
 Route::get('/', Homepage::class)->name('home');

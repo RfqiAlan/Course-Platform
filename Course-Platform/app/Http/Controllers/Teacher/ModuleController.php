@@ -15,7 +15,7 @@ class ModuleController extends Controller
 
         $modules = $course->modules()->orderBy('order')->get();
 
-        return view('teacher.modules.index', compact('course','modules'));
+        return view('teacher.modules.index', compact('course', 'modules'));
     }
 
     public function create(Course $course)
@@ -38,22 +38,27 @@ class ModuleController extends Controller
 
         Module::create($data);
 
-        return redirect()->route('teacher.courses.modules.index', $course)
+        return redirect()
+            ->route('teacher.courses.modules.index', $course)
             ->with('success', 'Modul berhasil dibuat.');
     }
 
-    public function edit(Course $course, Module $module)
-    {
-        $this->authorizeCourse($course);
-        abort_unless($module->course_id === $course->id, 404);
+    // =========================
+    // SHALLOW ROUTES
+    // =========================
 
-        return view('teacher.modules.edit', compact('course','module'));
+    public function edit(Module $module)
+    {
+        $course = $module->course;           // ambil course dari module
+        $this->authorizeCourse($course);
+
+        return view('teacher.modules.edit', compact('course', 'module'));
     }
 
-    public function update(Request $request, Course $course, Module $module)
+    public function update(Request $request, Module $module)
     {
+        $course = $module->course;
         $this->authorizeCourse($course);
-        abort_unless($module->course_id === $course->id, 404);
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
@@ -62,19 +67,21 @@ class ModuleController extends Controller
 
         $module->update($data);
 
-        return redirect()->route('teacher.modules.index', $course)
-            ->with('success','Modul berhasil diupdate.');
+        return redirect()
+            ->route('teacher.courses.modules.index', $course)
+            ->with('success', 'Modul berhasil diupdate.');
     }
 
-    public function destroy(Course $course, Module $module)
+    public function destroy(Module $module)
     {
+        $course = $module->course;
         $this->authorizeCourse($course);
-        abort_unless($module->course_id === $course->id, 404);
 
         $module->delete();
 
-        return redirect()->route('teacher.modules.index', $course)
-            ->with('success','Modul berhasil dihapus.');
+        return redirect()
+            ->route('teacher.courses.modules.index', $course)
+            ->with('success', 'Modul berhasil dihapus.');
     }
 
     protected function authorizeCourse(Course $course): void
