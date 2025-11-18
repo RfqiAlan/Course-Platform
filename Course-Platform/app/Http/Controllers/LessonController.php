@@ -2,95 +2,75 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Content;
 use App\Models\Course;
+use App\Models\Lesson;
+use App\Models\LessonUserProgress;
+use App\Models\Certificate;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class LessonController extends Controller
 {
-    public function enroll(Course $course)
+    public function markDone(Lesson $lesson)
     {
-        $user = Auth::user();
-
-        if (! $user->isStudent()) abort(403);
-
-        $user->enrolledCourses()->syncWithoutDetaching([
-            $course->id => ['started_at' => now()]
-        ]);
-
-        return redirect()->route('lessons.show', [
-            'course'  => $course->id,
-            'content' => $course->contents()->orderBy('order')->first()->id ?? null,
-        ])->with('status', 'Berhasil mengikuti course');
-    }
-
-    public function show(Course $course, Content $content)
-    {
-        $user = Auth::user();
-
-        // pastikan content milik course ini
-        if ($content->course_id != $course->id) {
-            abort(404);
-        }
-
-        // pastikan student sudah enroll
-        if (! $user->enrolledCourses()->where('course_id', $course->id)->exists()) {
-            return redirect()->route('courses.public.show', $course)
-                ->with('error','Silakan ikuti course terlebih dahulu.');
-        }
-
-        $contents = $course->contents()->orderBy('order')->get();
-
-        // cek progress content ini
-        $pivot = $content->studentsDone()->where('user_id',$user->id)->first();
-
-        return view('lessons.show', [
-            'course'   => $course,
-            'content'  => $content,
-            'contents' => $contents,
-            'done'     => $pivot ? true : false,
-        ]);
-    }
-
-    public function markDone(Content $content)
-    {
-        $user = Auth::user();
-
-        $course = $content->course;
-
-        if (! $user->enrolledCourses()->where('course_id', $course->id)->exists()) {
-            abort(403);
-        }
-
-        $user->doneContents()->syncWithoutDetaching([
-            $content->id => [
-                'is_done'     => true,
-                'completed_at'=> now(),
+        $user = auth()->user();
+        LessonUserProgress::updateOrCreate(
+            [
+                'lesson_id' => $lesson->id,
+                'user_id'   => $user->id,
+            ],
+            [
+                'is_done'      => true,
+                'completed_at' => now(),
             ]
-        ]);
+        );
 
-        // cari next content
-        $next = $course->contents()
-            ->where('order','>', $content->order)
-            ->orderBy('order')
-            ->first();
+        // 2. Ambil course terkait
+        $course = $lesson->module->course;
 
-        if ($next) {
-            return redirect()->route('lessons.show', [
-                'course'  => $course->id,
-                'content' => $next->id,
-            ])->with('status','Materi ditandai selesai, lanjut ke materi berikutnya.');
+        // 3. Ambil semua lesson id dalam course tsb
+        $lessonIds = $course->modules()
+            ->with('lessons:id,module_id')
+            ->get()
+            ->pluck('lessons.*.id')
+            ->flatten()
+            ->filter()
+            ->values();
+
+        $totalLessons = $lessonIds->count();
+
+        if ($totalLessons > 0) {
+            // 4. Hitung berapa lesson yang sudah selesai oleh user ini
+            $doneLessons = LessonUserProgress::where('user_id', $user->id)
+                ->whereIn('lesson_id', $lessonIds)
+                ->where('is_done', true)
+                ->count();
+
+            // 5. Kalau semua sudah selesai
+            if ($doneLessons === $totalLessons) {
+                // update pivot enrolledCourses → is_completed = true
+                $user->enrolledCourses()
+                    ->updateExistingPivot($course->id, ['is_completed' => true]);
+
+                // 6. Cek apakah sertifikat sudah ada
+                $alreadyHasCertificate = Certificate::where('course_id', $course->id)
+                    ->where('student_id', $user->id)
+                    ->exists();
+
+                if (! $alreadyHasCertificate) {
+                    // 7. Generate certificate_code unik
+                    $code = 'CRS-' . $course->id . '-STU-' . $user->id . '-' . strtoupper(Str::random(6));
+
+                    Certificate::create([
+                        'course_id'        => $course->id,
+                        'student_id'       => $user->id,
+                        'certificate_code' => $code,
+                        'issued_at'        => now(),
+                    ]);
+                }
+            }
         }
 
-        // bila konten terakhir: bisa tandai course complete
-        $user->enrolledCourses()->updateExistingPivot($course->id, [
-            'completed_at' => now(),
-        ]);
-
-        return redirect()->route('dashboard')
-            ->with('status','Selamat! Anda telah menyelesaikan course ini.');
+        return back()->with('success', 'Lesson ditandai selesai.');
     }
 }
-

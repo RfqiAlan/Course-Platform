@@ -2,31 +2,31 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Content extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'course_id','title','body','order','teacher_id'
+        'lesson_id',
+        'type',
+        'title',
+        'body',
+        'file_path',
+        'video_path',
+        'quiz_id',
+        'order',
     ];
 
-    public function course()
+    public function lesson()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(Lesson::class);
     }
 
-    public function teacher()
+    public function quiz()
     {
-        return $this->belongsTo(User::class, 'teacher_id');
-    }
-
-    public function studentsDone()
-    {
-        return $this->belongsToMany(User::class)
-            ->withPivot(['is_done','completed_at'])
-            ->wherePivot('is_done', true);
+        return $this->belongsTo(Quiz::class);
     }
 }

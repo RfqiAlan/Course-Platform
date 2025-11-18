@@ -1,108 +1,254 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
+// ==============================
+// Livewire (Public Pages)
+// ==============================
+use App\Livewire\Homepage;
+use App\Livewire\CourseCatalog;
+
+// Breeze Profile
 use App\Http\Controllers\ProfileController;
 
-use App\Http\Controllers\HomeController;
+// Admin Controllers
 use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\ContentController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\CourseController as AdminCourseController;
+
+// Teacher Controllers
+use App\Http\Controllers\Teacher\CourseController as TeacherCourseController;
+use App\Http\Controllers\Teacher\ModuleController as TeacherModuleController;
+use App\Http\Controllers\Teacher\LessonController as TeacherLessonController;
+use App\Http\Controllers\Teacher\ContentController as TeacherContentController;
+use App\Http\Controllers\Teacher\QuizController as TeacherQuizController;
+use App\Http\Controllers\Teacher\QuizQuestionController as TeacherQuizQuestionController;
+
+// Student Controllers
+use App\Http\Controllers\Student\CourseController as StudentCourseController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\LessonController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\QuizController;
 
-// =====================
-// Public Routes
-// =====================
+// ==============================
+// PUBLIC / GUEST
+// ==============================
+use Barryvdh\DomPDF\Facade\Pdf;
 
-// Halaman utama
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/test-pdf', function () {
+    $data = [
+        'name' => 'Tes PDF',
+        'course' => 'Laravel Course',
+        'date' => now()->format('d F Y'),
+    ];
 
-// Katalog course (bisa diakses guest & user login)
-Route::get('/courses', [CourseController::class, 'publicIndex'])
-    ->name('courses.public.index');
+    $pdf = Pdf::loadView('test-pdf', $data);
 
-Route::get('/courses/{course}', [CourseController::class, 'publicShow'])
-    ->name('courses.public.show');
+    return $pdf->download('test.pdf');
+});
 
-// Route auth dari Breeze (login, register, reset password)
+// Beranda (Livewire page)
+Route::get('/', Homepage::class)->name('home');
+
+// Katalog course (Livewire page)
+Route::get('/courses', CourseCatalog::class)->name('courses.index');
+
+// Detail course publik (pakai slug, ditangani StudentCourseController@show)
+Route::get('/courses/{course:slug}', [StudentCourseController::class, 'show'])
+    ->name('courses.show');
+
+// ==============================
+// AUTH (Breeze default)
+// ==============================
 require __DIR__ . '/auth.php';
 
+// ==============================
+// PROFILE (Breeze default)
+// ==============================
 
-// =====================
-// Protected Routes (auth + verified)
-// =====================
-Route::middleware(['auth', 'verified'])->group(function () {
-    // ===== PROFILE (Breeze default) =====
-    Route::get('/profile', [ProfileController::class, 'edit'])
-        ->name('profile.edit');
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
-    Route::patch('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
+// ==============================
+// DASHBOARD (Breeze redirect by role)
+// ==============================
 
-    Route::delete('/profile', [ProfileController::class, 'destroy'])
-        ->name('profile.destroy');
-    // Dashboard (isi-nya beda sesuai role di HomeController@dashboard)
-    Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+Route::get('/dashboard', function () {
+    $user = Auth::user();
+
+    if (! $user) {
+        return redirect()->route('home');
+    }
+
+    // Routing berdasarkan role
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.courses.index');
+    }
+
+    if ($user->role === 'teacher') {
+        return redirect()->route('teacher.courses.index');
+    }
+
+    if ($user->role === 'student') {
+        return redirect()->route('student.dashboard');
+    }
+
+    // fallback kalau role tidak dikenali
+    return redirect()->route('home');
+})->middleware(['auth'])->name('dashboard');
+
+// ==============================
+// PROTECTED (auth) – ADMIN, TEACHER, STUDENT
+// ==============================
+
+Route::middleware(['auth'])->group(function () {
+
+    // ==========================
+    // ADMIN
+    // ==========================
+    Route::middleware('role:admin')
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+            // resources/views/admin/users/*
+            Route::resource('users', AdminUserController::class);
+
+            // resources/views/admin/categories/*
+            Route::resource('categories', AdminCategoryController::class);
+
+            // resources/views/admin/courses/*
+            Route::resource('courses', AdminCourseController::class);
+        });
+
+    // ==========================
+    // TEACHER
+    // ==========================
+    Route::middleware('role:teacher')
+        ->prefix('teacher')
+        ->name('teacher.')
+        ->group(function () {
+            Route::get('ping', function () {
+            return 'OK TEACHER';
+            })->name('ping');
+
+            // ------ COURSES ------
+            // resources/views/teacher/courses/*
+            Route::resource('courses', TeacherCourseController::class);
+
+            // ------ MODULES ------
+            // Route resource nested: courses/{course}/modules/...
+            // View bisa di: resources/views/teacher/modules/*
+            Route::resource('courses.modules', TeacherModuleController::class)
+                ->shallow();
+            // Nama route penting:
+            // teacher.courses.modules.index   (list modul per course)
+            // teacher.courses.modules.create  (form buat modul)
+            // teacher.modules.edit            (edit modul) – shallow
+            // Route::get('modules/{module}/lessons', [TeacherLessonController::class, 'index'])
+            //     ->name('lessons.index');
 
 
-    // ---------- ADMIN ONLY ----------
-    Route::middleware('role:admin')->group(function () {
+            // ------ LESSONS ------
+            // Route nested: courses/{course}/modules/{module}/lessons/...
+            // View bisa di: resources/views/teacher/lessons/*
+            Route::resource('courses.modules.lessons', TeacherLessonController::class)
+                ->shallow();
+                // ->except(['index']);
+            // Nama route:
+            // teacher.courses.modules.lessons.index   (list lesson per module)
+            // teacher.courses.modules.lessons.create  (form buat lesson)
+            // teacher.lessons.edit                    (edit lesson) – shallow
 
-        // CRUD User
-        Route::resource('users', AdminUserController::class);
+            // ------ CONTENTS ------
+            // Route nested: courses/{course}/modules/{module}/lessons/{lesson}/contents/...
+            // View bisa di: resources/views/teacher/contents/*
+            Route::resource('courses.modules.lessons.contents', TeacherContentController::class)
+                ->shallow();
+            // Nama route:
+            // teacher.courses.modules.lessons.contents.index
+            // teacher.courses.modules.lessons.contents.create
+            // teacher.contents.edit – shallow
 
-        // CRUD Kategori
-        Route::resource('categories', CategoryController::class);
-    });
+            // ------ QUIZZES ------
+            // resources/views/teacher/quizzes/*
+            Route::resource('quizzes', TeacherQuizController::class);
 
+            // ------ QUIZ QUESTIONS ------
+            // resources/views/teacher/quizzes/questions/*
+            Route::prefix('quizzes/{quiz}')->group(function () {
+                Route::get('questions',        [TeacherQuizQuestionController::class, 'index'])
+                    ->name('quizzes.questions.index');
 
-    // ---------- ADMIN + TEACHER : manage course & content ----------
-    // ---------- ADMIN + TEACHER : manage course & content ----------
-Route::middleware('role:admin,teacher')
-    ->prefix('manage')
-    ->group(function () {
+                Route::get('questions/create', [TeacherQuizQuestionController::class, 'create'])
+                    ->name('quizzes.questions.create');
 
-        // URL: /manage/courses
-        // Name: courses.manage.index, courses.manage.create, dst
-        Route::resource('courses', CourseController::class)
-            ->except(['show'])
-            ->names([
-                'index'   => 'courses.manage.index',
-                'create'  => 'courses.manage.create',
-                'store'   => 'courses.manage.store',
-                'edit'    => 'courses.manage.edit',
-                'update'  => 'courses.manage.update',
-                'destroy' => 'courses.manage.destroy',
-            ]);
+                Route::post('questions',       [TeacherQuizQuestionController::class, 'store'])
+                    ->name('quizzes.questions.store');
+            });
 
-        // URL: /manage/contents
-        // Name: contents.index, contents.create, dst
-        Route::resource('contents', ContentController::class)
-            ->names([
-                'index'   => 'contents.index',
-                'create'  => 'contents.create',
-                'store'   => 'contents.store',
-                'show'    => 'contents.show',
-                'edit'    => 'contents.edit',
-                'update'  => 'contents.update',
-                'destroy' => 'contents.destroy',
-            ]);
-    });
+            Route::get('questions/{question}/edit', [TeacherQuizQuestionController::class, 'edit'])
+                ->name('quizzes.questions.edit');
 
+            Route::put('questions/{question}', [TeacherQuizQuestionController::class, 'update'])
+                ->name('quizzes.questions.update');
 
-    // ---------- STUDENT ONLY ----------
-    Route::middleware('role:student')->group(function () {
+            Route::delete('questions/{question}', [TeacherQuizQuestionController::class, 'destroy'])
+                ->name('quizzes.questions.destroy');
+        });
 
-        // Daftar / enroll ke course
-        Route::post('/courses/{course}/enroll', [LessonController::class, 'enroll'])
-            ->name('courses.enroll');
+    // ==========================
+    // STUDENT
+    // ==========================
+    Route::middleware('role:student')
+        ->prefix('student')
+        ->name('student.')
+        ->group(function () {
 
-        // Baca materi / lesson
-        Route::get('/courses/{course}/lessons/{content}', [LessonController::class, 'show'])
-            ->name('lessons.show');
+            // ------ DASHBOARD STUDENT ------
+            // View bisa di: resources/views/student/courses/index.blade.php
+            Route::get('/', [StudentCourseController::class, 'dashboard'])
+                ->name('dashboard');
 
-        // Tandai materi selesai
-        Route::post('/lessons/{content}/mark-done', [LessonController::class, 'markDone'])
-            ->name('lessons.mark-done');
-    });
+            // ------ DAFTAR COURSE YANG DIIKUTI ------
+            // resources/views/student/courses/index.blade.php
+            Route::get('courses', [StudentCourseController::class, 'index'])
+                ->name('courses.index');
+
+            // ------ ENROLL COURSE ------
+            Route::post('courses/{course}/enroll', [StudentCourseController::class, 'enroll'])
+                ->name('courses.enroll');
+
+            // ------ HALAMAN BELAJAR ------
+            // resources/views/student/courses/learn.blade.php
+            Route::get('courses/{course}/learn', [StudentCourseController::class, 'learn'])
+                ->name('courses.learn');
+
+            // ------ LESSON PROGRESS ------
+            Route::post('lessons/{lesson}/mark-done', [LessonController::class, 'markDone'])
+                ->name('lessons.mark-done');
+
+            // ------ SUBMIT QUIZ (non-Livewire) ------
+            Route::post('quizzes/{quiz}/submit', [QuizController::class, 'submit'])
+                ->name('quizzes.submit');
+
+            // ------ CERTIFICATE LIST ------
+            // resources/views/student/certificates/index.blade.php
+            Route::get('certificates', [CertificateController::class, 'index'])
+                ->name('certificates.index');
+
+            Route::get('courses/{course}/certificate', [CertificateController::class, 'show'])
+            ->name('courses.certificate.show');
+            // ------ CERTIFICATE DETAIL / PDF ------
+            // resources/views/student/certificates/show.blade.php atau PDF
+            Route::get('certificates/{certificate}', [CertificateController::class, 'show'])
+                ->name('certificates.show');
+
+            // ------ CERTIFICATE BY COURSE (opsional) ------
+            Route::get('courses/{course}/certificate', [CertificateController::class, 'showByCourse'])
+                ->name('courses.certificate');
+        });
 });

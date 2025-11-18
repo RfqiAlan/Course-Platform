@@ -4,27 +4,34 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
     /**
-     * roles diterima sebagai variadic parameter: role:admin,teacher
+     * Handle an incoming request.
+     *
+     * Pemakaian di route:
+     * ->middleware('role:teacher')
+     * atau
+     * ->middleware('role:teacher,admin')
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!Auth::check()) {
-            return redirect()->route('login');
+        if (! auth()->check()) {
+            abort(403);
         }
 
-        $userRole = Auth::user()->role;
+        // role user dari database
+        $userRole = strtolower(auth()->user()->role);
 
-        if (! in_array($userRole, $roles)) {
-            abort(403, 'Anda tidak memiliki hak akses.');
+        // normalisasi semua parameter role ke lowercase
+        $roles = array_map('strtolower', $roles);
+
+        if (! in_array($userRole, $roles, true)) {
+            abort(403);
         }
 
         return $next($request);
     }
 }
- 
