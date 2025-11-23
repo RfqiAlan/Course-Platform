@@ -81,9 +81,6 @@
                                                 Browser Anda tidak mendukung video HTML5.
                                             </video>
                                         </div>
-                                    @elseif($content->type === 'quiz' && $content->quiz)
-                                        @livewire('quiz-runner', ['quiz' => $content->quiz, 'lesson' => $currentLesson], key('quiz-'.$content->id))
-                                    @endif
                                 </div>
                             @empty
                                 <p class="small text-muted mb-0">

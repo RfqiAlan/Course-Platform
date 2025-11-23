@@ -29,7 +29,7 @@
     <h2>“{{ $course->title }}”</h2>
     <p>pada tanggal {{ $certificate->issued_at->format('d F Y') }}.</p>
 
-    <p style="margin-top:30px;">Universitas Samudra – LearnHub</p>
+    <p style="margin-top:30px;">Universitas Hasanuddin – EDVO</p>
     <div class="code">
         Kode Sertifikat: {{ $certificate->certificate_code }}
     </div>

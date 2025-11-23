@@ -58,14 +58,17 @@
                                class="form-control form-control-sm">
                     </div>
                     <div class="col-md-3 d-flex align-items-end">
-                        <div class="form-check small">
-                            <input class="form-check-input" type="checkbox" name="is_active"
-                                   id="is_active" value="1" {{ $course->is_active ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_active">
-                                Course aktif
-                            </label>
-                        </div>
-                    </div>
+    <div class="form-check small">
+        <input class="form-check-input" type="checkbox" name="is_active"
+               id="is_active"
+               value="1"
+               {{ old('is_active', $course->is_active) ? 'checked' : '' }}>
+        <label class="form-check-label" for="is_active">
+            Course aktif
+        </label>
+    </div>
+</div>
+
 
                     <div class="col-12 d-flex justify-content-end gap-2">
                         <a href="{{ route('teacher.courses.index') }}" class="btn btn-light btn-sm">

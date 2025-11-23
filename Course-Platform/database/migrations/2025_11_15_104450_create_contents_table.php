@@ -14,22 +14,18 @@ return new class extends Migration
                 ->constrained('lessons')
                 ->cascadeOnDelete();
 
-            $table->enum('type', ['text', 'file', 'video', 'quiz']);
+            $table->enum('type', ['text', 'file', 'video']);
+
             $table->string('title')->nullable();
 
-            // text: HTML dari editor
+            // text HTML
             $table->longText('body')->nullable();
 
             // file & video
             $table->string('file_path')->nullable();
             $table->string('video_path')->nullable();
 
-            // quiz terhubung
-            $table->foreignId('quiz_id')
-                ->nullable()
-                ->constrained('quizzes')
-                ->nullOnDelete();
-
+     
             $table->unsignedInteger('order')->default(0);
             $table->timestamps();
         });

@@ -72,7 +72,6 @@ class UserController extends Controller
             'email'    => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:6|confirmed',
             'role'     => 'required|in:admin,teacher,student',
-            'is_active'=> 'required|boolean',
         ]);
 
         if (!empty($data['password'])) {
@@ -80,7 +79,7 @@ class UserController extends Controller
         } else {
             unset($data['password']);
         }
-
+        $data['is_active'] = $request->has('is_active') ? 1 : 0;
         $user->update($data);
 
         return redirect()->route('admin.users.index')

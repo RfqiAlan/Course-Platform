@@ -53,5 +53,12 @@ class User extends Authenticatable
     {
     return $this->hasMany(\App\Models\Certificate::class, 'student_id');
     }
+    public function canAccessCourse($course)
+{
+    return
+        ($this->role === 'teacher' && $course->teacher_id === $this->id)
+        ||
+        ($this->role === 'student' && $this->courses()->where('course_id', $course->id)->exists());
+}
 
 }

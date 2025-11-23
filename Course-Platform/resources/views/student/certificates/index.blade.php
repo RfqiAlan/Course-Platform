@@ -29,10 +29,10 @@
                                     <td>{{ $certificate->course->title ?? '-' }}</td>
                                     <td>{{ $certificate->created_at->format('d M Y') }}</td>
                                     <td class="text-end">
-                                        <a href="{{ route('student.certificates.show', $certificate) }}"
-                                           class="btn btn-outline-primary btn-sm">
-                                            Lihat / Download
-                                        </a>
+                                        <a href="{{ route('student.certificates.download', $certificate) }}"
+   class="btn btn-sm btn-primary">
+    <i class="bi bi-download me-1"></i> Download
+</a>
                                     </td>
                                 </tr>
                             @endforeach

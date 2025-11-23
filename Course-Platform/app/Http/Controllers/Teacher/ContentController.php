@@ -7,7 +7,6 @@ use App\Models\Content;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Module;
-use App\Models\Quiz;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -39,13 +38,10 @@ class ContentController extends Controller
         abort_unless($module->course_id === $course->id, 404);
         abort_unless($lesson->module_id === $module->id, 404);
 
-        $quizzes = Quiz::orderBy('title')->get();
-
         return view('teacher.contents.create', [
-            'course'  => $course,
-            'module'  => $module,
-            'lesson'  => $lesson,
-            'quizzes' => $quizzes,
+            'course' => $course,
+            'module' => $module,
+            'lesson' => $lesson,
         ]);
     }
 
@@ -60,17 +56,16 @@ class ContentController extends Controller
         abort_unless($lesson->module_id === $module->id, 404);
 
         $data = $request->validate([
-            'type'      => 'required|in:text,file,video,quiz',
-            'title'     => 'nullable|string|max:255',
-            'body'      => 'nullable|string',
+            'type' => 'required|in:text,file,video',
+            'title' => 'nullable|string|max:255',
+            'body' => 'nullable|string',
             'file_path' => 'nullable|file',
-            'video_path'=> 'nullable|file',
-            'quiz_id'   => 'nullable|exists:quizzes,id',
-            'order'     => 'nullable|integer',
+            'video_path' => 'nullable|file',
+            'order' => 'nullable|integer',
         ]);
 
         // jika order kosong, set max+1
-        if (! isset($data['order']) || $data['order'] === '' || $data['order'] === null) {
+        if (!isset($data['order']) || $data['order'] === '' || $data['order'] === null) {
             $maxOrder = $lesson->contents()->max('order');
             $data['order'] = ($maxOrder ?? 0) + 1;
         }
@@ -109,9 +104,7 @@ class ContentController extends Controller
 
         $this->authorizeCourse($course);
 
-        $quizzes = Quiz::orderBy('title')->get();
-
-        return view('teacher.contents.edit', compact('course', 'module', 'lesson', 'content', 'quizzes'));
+        return view('teacher.contents.edit', compact('course', 'module', 'lesson', 'content'));
     }
 
     /**
@@ -128,13 +121,12 @@ class ContentController extends Controller
         $this->authorizeCourse($course);
 
         $data = $request->validate([
-            'type'      => 'required|in:text,file,video,quiz',
-            'title'     => 'nullable|string|max:255',
-            'body'      => 'nullable|string',
+            'type' => 'required|in:text,file,video',
+            'title' => 'nullable|string|max:255',
+            'body' => 'nullable|string',
             'file_path' => 'nullable|file',
-            'video_path'=> 'nullable|file',
-            'quiz_id'   => 'nullable|exists:quizzes,id',
-            'order'     => 'nullable|integer',
+            'video_path' => 'nullable|file',
+            'order' => 'nullable|integer',
         ]);
 
         if ($request->hasFile('file_path')) {
@@ -151,9 +143,12 @@ class ContentController extends Controller
             $data['video_path'] = $request->file('video_path')->store('course/videos', 'public');
         }
 
-        // kalau order diubah jadi kosong, bisa di-auto lagi (opsional)
-        if (! isset($data['order']) || $data['order'] === '' || $data['order'] === null) {
-            $maxOrder = $lesson->contents()->where('id', '!=', $content->id)->max('order');
+        // kalau order diubah jadi kosong, auto lagi
+        if (!isset($data['order']) || $data['order'] === '' || $data['order'] === null) {
+            $maxOrder = $lesson->contents()
+                ->where('id', '!=', $content->id)
+                ->max('order');
+
             $data['order'] = ($maxOrder ?? 0) + 1;
         }
 

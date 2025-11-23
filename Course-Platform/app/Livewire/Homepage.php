@@ -10,7 +10,7 @@ class Homepage extends Component
     {
         return view('livewire.homepage')
             ->layout('components.layouts.app', [
-                'title' => 'Beranda – LearnHub',
+                'title' => 'Beranda – EDVO',
             ]);
     }
 }

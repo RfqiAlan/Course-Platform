@@ -70,7 +70,7 @@ class CourseCatalog extends Component
             'courses' => $courses,
         ])
         ->layout('components.layouts.app', [
-            'title' => 'Katalog Kursus – LearnHub',
+            'title' => 'Katalog Kursus – EDVO',
         ]);
 }
 

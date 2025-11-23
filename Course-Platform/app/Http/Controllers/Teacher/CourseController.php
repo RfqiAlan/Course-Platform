@@ -30,21 +30,22 @@ class CourseController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title'       => 'required|string|max:255',
+            'title' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
-            'start_date'  => 'nullable|date',
-            'end_date'    => 'nullable|date|after_or_equal:start_date',
-            'preview_video'=> 'nullable|file|mimetypes:video/mp4,video/x-m4v,video/quicktime|max:51200', // max 50MB
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'preview_video' => 'nullable|file|mimetypes:video/mp4,video/x-m4v,video/quicktime|max:51200', // max 50MB
+            'is_active'    => 'nullable|boolean',
         ]);
 
         $data['teacher_id'] = auth()->id();
         $data['slug'] = Str::slug($data['title']) . '-' . Str::random(4);
-        $data['is_active'] = true;
+         $data['is_active']  = $request->has('is_active');
         if ($request->hasFile('preview_video')) {
-        $data['preview_video'] = $request->file('preview_video')
-            ->store('course_previews', 'public');
-    }
+            $data['preview_video'] = $request->file('preview_video')
+                ->store('course_previews', 'public');
+        }
         Course::create($data);
 
         return redirect()->route('teacher.courses.index')
@@ -57,7 +58,7 @@ class CourseController extends Controller
 
         $categories = Category::all();
 
-        return view('teacher.courses.edit', compact('course','categories'));
+        return view('teacher.courses.edit', compact('course', 'categories'));
     }
 
     public function update(Request $request, Course $course)
@@ -65,20 +66,20 @@ class CourseController extends Controller
         $this->authorizeOwnership($course);
 
         $data = $request->validate([
-            'title'       => 'required|string|max:255',
+            'title' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
-            'start_date'  => 'nullable|date',
-            'end_date'    => 'nullable|date|after_or_equal:start_date',
-            'is_active'   => 'nullable|boolean',
-            'preview_video'=> 'nullable|file|mimetypes:video/mp4,video/x-m4v,video/quicktime|max:51200',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'preview_video' => 'nullable|file|mimetypes:video/mp4,video/x-m4v,video/quicktime|max:51200',
+            'is_active'    => 'nullable|boolean',
         ]);
 
         if ($data['title'] !== $course->title) {
             $data['slug'] = Str::slug($data['title']) . '-' . Str::random(4);
         }
 
-        $data['is_active'] = $data['is_active'] ?? false;
+         $data['is_active'] = $request->has('is_active');
 
         $course->update($data);
 
@@ -95,6 +96,16 @@ class CourseController extends Controller
         return redirect()->route('teacher.courses.index')
             ->with('success', 'Course berhasil dihapus.');
     }
+    public function show(Course $course)
+    {
+        $this->authorizeOwnership($course);
+
+        // load relasi yang dibutuhkan di view (opsional)
+        $course->load(['category', 'modules.lessons']);
+
+        return view('teacher.courses.show', compact('course'));
+    }
+
 
     protected function authorizeOwnership(Course $course): void
     {

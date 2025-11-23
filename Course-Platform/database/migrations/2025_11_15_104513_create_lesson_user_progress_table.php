@@ -13,12 +13,12 @@ return new class extends Migration
             $table->foreignId('lesson_id')
                 ->constrained('lessons')
                 ->cascadeOnDelete();
+
             $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
 
             $table->boolean('is_done')->default(false);
-            $table->boolean('quiz_passed')->default(false);
             $table->timestamp('completed_at')->nullable();
 
             $table->timestamps();

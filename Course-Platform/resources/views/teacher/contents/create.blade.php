@@ -26,7 +26,6 @@
                             <option value="text"  @selected(old('type')==='text')>Teks</option>
                             <option value="file"  @selected(old('type')==='file')>File</option>
                             <option value="video" @selected(old('type')==='video')>Video</option>
-                            <option value="quiz"  @selected(old('type')==='quiz')>Quiz</option>
                         </select>
                         @error('type')
                             <div class="invalid-feedback small">{{ $message }}</div>
@@ -74,21 +73,6 @@
                         @enderror
                     </div>
 
-                    <div class="col-12">
-                        <label class="form-label small">Pilih Quiz (jika type = quiz)</label>
-                        <select name="quiz_id"
-                                class="form-select form-select-sm @error('quiz_id') is-invalid @enderror">
-                            <option value="">-- Pilih Quiz --</option>
-                            @foreach($quizzes as $quiz)
-                                <option value="{{ $quiz->id }}" @selected(old('quiz_id') == $quiz->id)>
-                                    {{ $quiz->title }} (Lulus: {{ $quiz->pass_score }}%)
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('quiz_id')
-                            <div class="invalid-feedback small">{{ $message }}</div>
-                        @enderror
-                    </div>
 
                     <div class="col-12 d-flex justify-content-end gap-2">
                         <a href="{{ route('teacher.lessons.show', $lesson) }}"

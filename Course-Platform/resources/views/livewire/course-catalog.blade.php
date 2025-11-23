@@ -45,7 +45,7 @@
                         <ul class="small text-muted mb-0">
                             <li>Materi singkat & fokus</li>
                             <li>Cocok untuk perangkat mobile</li>
-                            <li>Tugas dan quiz per modul</li>
+                            <li>Tugas per modul</li>
                         </ul>
                     </div>
                 </div>

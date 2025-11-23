@@ -1,10 +1,10 @@
-<x-app-layout :title="'Belajar: '.$course->title">
+<x-app-layout :title="'Belajar: ' . $course->title">
     <div class="container-fluid py-3">
         <div class="row g-3">
-            
+
             {{-- ========================= --}}
             {{-- SIDEBAR KIRI (MODUL & LESSON) --}}
-            {{-- ========================= --}} 
+            {{-- ========================= --}}
             <div class="col-lg-3">
                 <div class="card border-0 shadow-sm rounded-4" style="position: sticky; top: 80px;">
                     <div class="card-body p-3">
@@ -19,37 +19,35 @@
 
                                 <ul class="list-unstyled ms-3 mt-2">
                                     @foreach($m->lessons as $l)
-    @php
-        $active = isset($currentLesson) && $l->id === $currentLesson->id;
-        $isDone = isset($doneLessonIds) && in_array($l->id, $doneLessonIds);
-    @endphp
+                                        @php
+                                            $active = isset($currentLesson) && $l->id === $currentLesson->id;
+                                            $isDone = isset($doneLessonIds) && in_array($l->id, $doneLessonIds);
+                                        @endphp
 
-    <li class="mb-1">
-        <a href="{{ route('student.courses.learn', [$course->id, 'lesson' => $l->id]) }}"
-           class="d-flex align-items-center p-2 rounded-3 small
-           @if($active)
-                bg-primary text-white fw-semibold
-           @elseif($isDone)
-                bg-success-subtle text-success border border-success
-           @else
-                bg-light text-dark
-           @endif"
-           style="text-decoration:none; border-left: 4px solid {{ $isDone ? '#198754' : 'transparent' }};">
-           
-            {{-- titik hijau kecil di kiri kalau sudah selesai --}}
-            @if($isDone)
-                <span class="me-2 rounded-circle" 
-                      style="width:8px; height:8px; background-color:#198754;"></span>
-            @else
-                <span class="me-2" style="width:8px; height:8px;"></span>
-            @endif
+                                        <li class="mb-1">
+                                            <a href="{{ route('student.courses.learn', [$course->id, 'lesson' => $l->id]) }}"
+                                                class="d-flex align-items-center p-2 rounded-3 small
+                                                       @if($active)
+                                                        bg-primary text-white fw-semibold
+                                                       @elseif($isDone)
+                                                        bg-success-subtle text-success border border-success
+                                                       @else
+                                                        bg-light text-dark
+                                                       @endif"
+                                                style="text-decoration:none; border-left: 4px solid {{ $isDone ? '#198754' : 'transparent' }};">
+                                                {{-- titik hijau kecil di kiri kalau sudah selesai --}}
+                                                @if($isDone)
+                                                    <span class="me-2 rounded-circle"
+                                                        style="width:8px; height:8px; background-color:#198754;"></span>
+                                                @else
+                                                    <span class="me-2" style="width:8px; height:8px;"></span>
+                                                @endif
 
-            <i class="bi bi-play-circle me-2"></i> 
-            <span class="text-truncate">{{ $l->title }}</span>
-        </a>
-    </li>
-@endforeach
-
+                                                <i class="bi bi-play-circle me-2"></i>
+                                                <span class="text-truncate">{{ $l->title }}</span>
+                                            </a>
+                                        </li>
+                                    @endforeach
                                 </ul>
                             </div>
                         @endforeach
@@ -58,9 +56,10 @@
             </div>
 
             {{-- ========================= --}}
-            {{-- KONTEN UTAMA (LESSON DETAIL) --}}
+            {{-- KONTEN UTAMA (LESSON + CHAT) --}}
             {{-- ========================= --}}
             <div class="col-lg-9">
+                {{-- CARD KONTEN LESSON --}}
                 <div class="card border-0 shadow-sm rounded-4">
                     <div class="card-body p-4">
 
@@ -99,9 +98,8 @@
                                 @if($content->type === 'file')
                                     <div class="mb-4">
                                         <h6 class="fw-semibold">{{ $content->title }}</h6>
-                                        <a href="{{ Storage::url($content->file_path) }}"
-                                           class="btn btn-outline-primary btn-sm"
-                                           target="_blank">
+                                        <a href="{{ Storage::url($content->file_path) }}" class="btn btn-outline-primary btn-sm"
+                                            target="_blank">
                                             <i class="bi bi-file-earmark-arrow-down me-1"></i> Unduh File
                                         </a>
                                     </div>
@@ -119,19 +117,6 @@
                                     </div>
                                 @endif
 
-                                {{-- QUIZ --}}
-                                @if($content->type === 'quiz' && $content->quiz)
-                                    <div class="mb-4">
-                                        <h5 class="fw-semibold mb-2">
-                                            Quiz: {{ $content->quiz->title }}
-                                        </h5>
-                                        @livewire('quiz-runner', [
-                                            'quiz'   => $content->quiz,
-                                            'lesson' => $currentLesson
-                                        ], key('quiz-'.$content->id))
-                                    </div>
-                                @endif
-
                             @empty
                                 <div class="alert alert-light border small">
                                     Tidak ada materi untuk lesson ini.
@@ -141,8 +126,8 @@
                             <hr>
 
                             {{-- ===== BUTTON MARK AS DONE ===== --}}
-                            <form action="{{ route('student.lessons.mark-done', $currentLesson) }}"
-                                  method="POST" class="mb-3">
+                            <form action="{{ route('student.lessons.mark-done', $currentLesson) }}" method="POST"
+                                class="mb-3">
                                 @csrf
                                 <button class="btn btn-success">
                                     <i class="bi bi-check2-circle me-1"></i>
@@ -152,14 +137,13 @@
 
                             {{-- ===== NEXT / PREVIOUS ===== --}}
                             <div class="d-flex justify-content-between">
-                                
                                 {{-- PREVIOUS --}}
                                 @php
                                     $prev = $course->getPrevLesson($currentLesson);
                                 @endphp
                                 @if($prev)
                                     <a class="btn btn-outline-secondary btn-sm"
-                                       href="{{ route('student.courses.learn', [$course->id, 'lesson'=>$prev->id]) }}">
+                                        href="{{ route('student.courses.learn', [$course->id, 'lesson' => $prev->id]) }}">
                                         <i class="bi bi-arrow-left me-1"></i> Sebelumnya
                                     </a>
                                 @else
@@ -172,43 +156,40 @@
                                 @endphp
                                 @if($next)
                                     <a class="btn btn-primary btn-sm"
-                                       href="{{ route('student.courses.learn', [$course->id, 'lesson'=>$next->id]) }}">
+                                        href="{{ route('student.courses.learn', [$course->id, 'lesson' => $next->id]) }}">
                                         Selanjutnya <i class="bi bi-arrow-right ms-1"></i>
                                     </a>
                                 @endif
-
                             </div>
 
                         @else
-
                             {{-- ===== JIKA BELUM PILIH LESSON ===== --}}
                             <div class="text-center py-5">
                                 <i class="bi bi-journal-bookmark fs-1 text-primary"></i>
                                 <h5 class="mt-3 fw-semibold">Pilih Lesson untuk Mulai Belajar</h5>
                                 <p class="text-muted small">Silakan pilih lesson dari sidebar kiri.</p>
                             </div>
-
                         @endisset
 
                     </div>
                 </div>
 
+                {{-- ========================= --}}
+                {{-- LIVE CHAT DI BAWAH KONTEN --}}
+                {{-- ========================= --}}
+                <div class="row g-3 mt-3">
 
-                {{-- OPSIONAL: LIVE CHAT --}}
-                @if(isset($enableChat) && $enableChat === true)
-                    <div class="mt-3">
-                        @livewire('course-chat', ['course_id' => $course->id])
+                    <div class="col-lg-6">
+                        {{-- Chat Kelas tanpa Livewire --}}
+                        @include('components.course-discussion-box', ['course' => $course])
                     </div>
-                @endif
-
-                {{-- OPSIONAL: DISCUSSION FORUM --}}
-                @if(isset($enableDiscussion) && $enableDiscussion === true)
-                    <div class="mt-3">
-                        @livewire('course-discussion', ['course_id' => $course->id])
+                    <div class="col-lg-6">
+                        @include('components.private-chat-box', ['course' => $course])
                     </div>
-                @endif
+                </div>
 
-            </div>
+            </div> {{-- /col-lg-9 --}}
         </div>
     </div>
+
 </x-app-layout>

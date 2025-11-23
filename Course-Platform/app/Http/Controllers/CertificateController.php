@@ -27,7 +27,7 @@ class CertificateController extends Controller
     public function show(Certificate $certificate)
     {
         // pastikan student hanya bisa lihat sertifikat miliknya
-        abort_unless($certificate->user_id === auth()->id(), 403);
+        abort_unless($certificate->student_id === auth()->id(), 403);
 
         return view('student.certificates.show', [
             'certificate' => $certificate,

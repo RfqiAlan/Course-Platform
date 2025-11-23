@@ -13,7 +13,6 @@
                       method="POST" class="row g-3">
                     @csrf
                     @method('PUT')
-
                     <div class="col-md-6">
                         <label class="form-label small">Nama Kategori</label>
                         <input type="text" name="name" value="{{ old('name',$category->name) }}"

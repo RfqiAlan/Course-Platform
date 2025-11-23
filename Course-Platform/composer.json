@@ -10,7 +10,6 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "endroid/qr-code": "^6.0",
         "laravel/framework": "^12.0",
-        "laravel/reverb": "^1.6",
         "laravel/tinker": "^2.10.1",
         "livewire/livewire": "^3.6"
     },
@@ -19,6 +18,7 @@
         "laravel/breeze": "^2.3",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.24",
+        "laravel/reverb": "^1.6",
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",

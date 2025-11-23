@@ -41,7 +41,7 @@ class CourseController extends Controller
         ]);
 
         $data['slug'] = Str::slug($data['title']) . '-' . Str::random(4);
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] = $request->has('is_active');
 
         Course::create($data);
 
@@ -73,7 +73,7 @@ class CourseController extends Controller
             $data['slug'] = Str::slug($data['title']) . '-' . Str::random(4);
         }
 
-        $data['is_active'] = $data['is_active'] ?? false;
+        $data['is_active'] = $request->has('is_active');
 
         $course->update($data);
 

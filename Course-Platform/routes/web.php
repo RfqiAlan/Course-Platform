@@ -16,6 +16,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
+use App\Http\Controllers\Admin\DashboardController;
 
 // Teacher Controllers
 use App\Http\Controllers\Teacher\CourseController as TeacherCourseController;
@@ -24,34 +25,39 @@ use App\Http\Controllers\Teacher\LessonController as TeacherLessonController;
 use App\Http\Controllers\Teacher\ContentController as TeacherContentController;
 use App\Http\Controllers\Teacher\QuizController as TeacherQuizController;
 use App\Http\Controllers\Teacher\QuizQuestionController as TeacherQuizQuestionController;
+use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
+use App\Http\Controllers\Teacher\DiscussionController as TeacherDiscussionController;
+use App\Http\Controllers\Teacher\PrivateChatController as TeacherPrivateChatController;
 
 // Student Controllers
 use App\Http\Controllers\Student\CourseController as StudentCourseController;
-use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\Student\CertificateController as StudentCertificateController;
+use App\Http\Controllers\Student\DiscussionController as StudentDiscussionController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Student\PrivateChatController as StudentPrivateChatController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\QuizController;
-
-// ==============================
-// PUBLIC / GUEST
-// ==============================
 use Barryvdh\DomPDF\Facade\Pdf;
 
 
-Route::get('/test-sertifikat', function () {
-
-    $pdf = Pdf::loadView('certificates.template', [
-        'user' => (object)['name' => 'Rifqi Alan Maulana'],
-        'course' => (object)['title' => 'Laravel Mastery Bootcamp'],
-        'date' => now()->format('d F Y'),
-        'code' => 'CERT-TEST-123',
-    ]);
-
-    return $pdf->download('sertifikat-uji.pdf');
-});
-
 
 // Beranda (Livewire page)
-Route::get('/', Homepage::class)->name('home');
+Route::get('/', function () {
+    // Jika belum login → tampilkan homepage
+    if (!Auth::check()) {
+        return app()->call(\App\Livewire\Homepage::class);
+    }
+
+    // Jika sudah login → masuk sesuai role
+    $user = Auth::user();
+
+    return match ($user->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'teacher' => redirect()->route('teacher.dashboard'),
+        'student' => redirect()->route('student.dashboard'),
+        default => redirect()->route('courses.index'),
+    };
+})->name('home');
 
 // Katalog course (Livewire page)
 Route::get('/courses', CourseCatalog::class)->name('courses.index');
@@ -69,7 +75,7 @@ require __DIR__ . '/auth.php';
 // PROFILE (Breeze default)
 // ==============================
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -82,17 +88,17 @@ Route::middleware('auth')->group(function () {
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
-    if (! $user) {
+    if (!$user) {
         return redirect()->route('home');
     }
 
     // Routing berdasarkan role
     if ($user->role === 'admin') {
-        return redirect()->route('admin.courses.index');
+        return redirect()->route('admin.dashboard');
     }
 
     if ($user->role === 'teacher') {
-        return redirect()->route('teacher.courses.index');
+        return redirect()->route('teacher.dashboard');
     }
 
     if ($user->role === 'student') {
@@ -101,13 +107,13 @@ Route::get('/dashboard', function () {
 
     // fallback kalau role tidak dikenali
     return redirect()->route('home');
-})->middleware(['auth'])->name('dashboard');
+})->middleware(['auth', 'active'])->name('dashboard');
 
 // ==============================
 // PROTECTED (auth) – ADMIN, TEACHER, STUDENT
 // ==============================
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'active'])->group(function () {
 
     // ==========================
     // ADMIN
@@ -116,6 +122,8 @@ Route::middleware(['auth'])->group(function () {
         ->prefix('admin')
         ->name('admin.')
         ->group(function () {
+            Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
+                ->name('dashboard');
             // resources/views/admin/users/*
             Route::resource('users', AdminUserController::class);
 
@@ -134,9 +142,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('teacher.')
         ->group(function () {
             Route::get('ping', function () {
-            return 'OK TEACHER';
+                return 'OK TEACHER';
             })->name('ping');
-
+            Route::get('/', [\App\Http\Controllers\Teacher\DashboardController::class, 'index'])
+                ->name('dashboard');
             // ------ COURSES ------
             // resources/views/teacher/courses/*
             Route::resource('courses', TeacherCourseController::class);
@@ -152,19 +161,19 @@ Route::middleware(['auth'])->group(function () {
             // teacher.modules.edit            (edit modul) – shallow
             // Route::get('modules/{module}/lessons', [TeacherLessonController::class, 'index'])
             //     ->name('lessons.index');
-
+    
 
             // ------ LESSONS ------
             // Route nested: courses/{course}/modules/{module}/lessons/...
             // View bisa di: resources/views/teacher/lessons/*
             Route::resource('courses.modules.lessons', TeacherLessonController::class)
                 ->shallow();
-                // ->except(['index']);
+            // ->except(['index']);
             // Nama route:
             // teacher.courses.modules.lessons.index   (list lesson per module)
             // teacher.courses.modules.lessons.create  (form buat lesson)
             // teacher.lessons.edit                    (edit lesson) – shallow
-
+    
             // ------ CONTENTS ------
             // Route nested: courses/{course}/modules/{module}/lessons/{lesson}/contents/...
             // View bisa di: resources/views/teacher/contents/*
@@ -174,32 +183,26 @@ Route::middleware(['auth'])->group(function () {
             // teacher.courses.modules.lessons.contents.index
             // teacher.courses.modules.lessons.contents.create
             // teacher.contents.edit – shallow
+    
+            // buka chat dengan murid
+// DISKUSI KELAS (GURU)
+            Route::post('courses/{course}/discussion', [TeacherDiscussionController::class, 'store'])
+                ->name('courses.discussion.store');
 
-            // ------ QUIZZES ------
-            // resources/views/teacher/quizzes/*
-            Route::resource('quizzes', TeacherQuizController::class);
+            // Opsional: halaman khusus melihat diskusi course
+            Route::get('courses/{course}/discussion', [TeacherDiscussionController::class, 'index'])
+                ->name('courses.discussion');
 
-            // ------ QUIZ QUESTIONS ------
-            // resources/views/teacher/quizzes/questions/*
-            Route::prefix('quizzes/{quiz}')->group(function () {
-                Route::get('questions',        [TeacherQuizQuestionController::class, 'index'])
-                    ->name('quizzes.questions.index');
+            Route::get('private-chats', [TeacherPrivateChatController::class, 'index'])
+                ->name('private-chats.index');
 
-                Route::get('questions/create', [TeacherQuizQuestionController::class, 'create'])
-                    ->name('quizzes.questions.create');
+            // detail chat dengan 1 student
+            Route::get('private-chats/{thread}', [TeacherPrivateChatController::class, 'show'])
+                ->name('private-chats.show');
 
-                Route::post('questions',       [TeacherQuizQuestionController::class, 'store'])
-                    ->name('quizzes.questions.store');
-            });
-
-            Route::get('questions/{question}/edit', [TeacherQuizQuestionController::class, 'edit'])
-                ->name('quizzes.questions.edit');
-
-            Route::put('questions/{question}', [TeacherQuizQuestionController::class, 'update'])
-                ->name('quizzes.questions.update');
-
-            Route::delete('questions/{question}', [TeacherQuizQuestionController::class, 'destroy'])
-                ->name('quizzes.questions.destroy');
+            // kirim pesan ke thread
+            Route::post('private-chats/{thread}', [TeacherPrivateChatController::class, 'store'])
+                ->name('private-chats.store');
         });
 
     // ==========================
@@ -210,47 +213,53 @@ Route::middleware(['auth'])->group(function () {
         ->name('student.')
         ->group(function () {
 
+
             // ------ DASHBOARD STUDENT ------
             // View bisa di: resources/views/student/courses/index.blade.php
             Route::get('/', [StudentCourseController::class, 'dashboard'])
                 ->name('dashboard');
+            Route::middleware('course.active')->group(function () {
+                // ------ DAFTAR COURSE YANG DIIKUTI ------
+                // resources/views/student/courses/index.blade.php
+                Route::get('courses', [StudentCourseController::class, 'index'])
+                    ->name('courses.index');
 
-            // ------ DAFTAR COURSE YANG DIIKUTI ------
-            // resources/views/student/courses/index.blade.php
-            Route::get('courses', [StudentCourseController::class, 'index'])
-                ->name('courses.index');
-
-            // ------ ENROLL COURSE ------
-            Route::post('courses/{course}/enroll', [StudentCourseController::class, 'enroll'])
-                ->name('courses.enroll');
-
-            // ------ HALAMAN BELAJAR ------
-            // resources/views/student/courses/learn.blade.php
-            Route::get('courses/{course}/learn', [StudentCourseController::class, 'learn'])
-                ->name('courses.learn');
-
+                // ------ ENROLL COURSE ------
+                Route::post('courses/{course}/enroll', [StudentCourseController::class, 'enroll'])
+                    ->name('courses.enroll');
+                 // buka chat dengan guru tertentu
+                Route::post('courses/{course}/discussion', [StudentDiscussionController::class, 'store'])
+                    ->name('courses.discussion.store');
+                // ------ HALAMAN BELAJAR ------
+                // resources/views/student/courses/learn.blade.php
+                Route::get('courses/{course}/learn', [StudentCourseController::class, 'learn'])
+                    ->name('courses.learn');
+            });
             // ------ LESSON PROGRESS ------
             Route::post('lessons/{lesson}/mark-done', [LessonController::class, 'markDone'])
                 ->name('lessons.mark-done');
 
-            // ------ SUBMIT QUIZ (non-Livewire) ------
-            Route::post('quizzes/{quiz}/submit', [QuizController::class, 'submit'])
-                ->name('quizzes.submit');
+           
 
+            Route::post('courses/{course}/chat', [StudentPrivateChatController::class, 'store'])
+                ->name('courses.chat.store');
             // ------ CERTIFICATE LIST ------
             // resources/views/student/certificates/index.blade.php
-            Route::get('certificates', [CertificateController::class, 'index'])
+            // ------ CERTIFICATE LIST ------
+            Route::get('certificates', [StudentCertificateController::class, 'index'])
                 ->name('certificates.index');
 
-            Route::get('courses/{course}/certificate', [CertificateController::class, 'show'])
-            ->name('courses.certificate.show');
-            // ------ CERTIFICATE DETAIL / PDF ------
-            // resources/views/student/certificates/show.blade.php atau PDF
-            Route::get('certificates/{certificate}', [CertificateController::class, 'show'])
+            // DETAIL SERTIFIKAT
+            Route::get('certificates/{certificate}', [StudentCertificateController::class, 'show'])
                 ->name('certificates.show');
 
-            // ------ CERTIFICATE BY COURSE (opsional) ------
-            Route::get('courses/{course}/certificate', [CertificateController::class, 'showByCourse'])
-                ->name('courses.certificate');
+            // DOWNLOAD PDF
+            Route::get('certificates/{certificate}/download', [StudentCertificateController::class, 'download'])
+                ->name('certificates.download');
+
+            // SERTIFIKAT BERDASARKAN COURSE (opsional)
+            Route::get('courses/{course}/certificate', [StudentCertificateController::class, 'showByCourse'])
+                ->name('courses.certificate.show');
+
         });
 });

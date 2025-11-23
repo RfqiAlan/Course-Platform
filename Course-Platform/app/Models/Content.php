@@ -16,17 +16,11 @@ class Content extends Model
         'body',
         'file_path',
         'video_path',
-        'quiz_id',
         'order',
     ];
 
     public function lesson()
     {
         return $this->belongsTo(Lesson::class);
-    }
-
-    public function quiz()
-    {
-        return $this->belongsTo(Quiz::class);
     }
 }

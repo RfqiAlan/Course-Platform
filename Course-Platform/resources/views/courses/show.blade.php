@@ -1,4 +1,4 @@
-<x-app-layout :title="$course->title.' – LearnHub'">
+<x-app-layout :title="$course->title.' – EDVO'">
     <div class="container py-4">
         <div class="row g-4">
             <div class="col-lg-8">
