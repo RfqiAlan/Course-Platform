@@ -3,29 +3,19 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-// ==============================
-// Livewire (Public Pages)
-// ==============================
-use App\Livewire\Homepage;
-use App\Livewire\CourseCatalog;
-
-// Breeze Profile
+// Profile (Breeze)
 use App\Http\Controllers\ProfileController;
 
 // Admin Controllers
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
-use App\Http\Controllers\Admin\DashboardController;
 
 // Teacher Controllers
 use App\Http\Controllers\Teacher\CourseController as TeacherCourseController;
 use App\Http\Controllers\Teacher\ModuleController as TeacherModuleController;
 use App\Http\Controllers\Teacher\LessonController as TeacherLessonController;
 use App\Http\Controllers\Teacher\ContentController as TeacherContentController;
-use App\Http\Controllers\Teacher\QuizController as TeacherQuizController;
-use App\Http\Controllers\Teacher\QuizQuestionController as TeacherQuizQuestionController;
-use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
 use App\Http\Controllers\Teacher\DiscussionController as TeacherDiscussionController;
 use App\Http\Controllers\Teacher\PrivateChatController as TeacherPrivateChatController;
 
@@ -35,9 +25,9 @@ use App\Http\Controllers\Student\CertificateController as StudentCertificateCont
 use App\Http\Controllers\Student\DiscussionController as StudentDiscussionController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\PrivateChatController as StudentPrivateChatController;
+use App\Http\Controllers\Student\ContentController as StudentContentController;
+
 use App\Http\Controllers\LessonController;
-use App\Http\Controllers\QuizController;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 
 
@@ -45,7 +35,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 Route::get('/', function () {
     // Jika belum login → tampilkan homepage
     if (!Auth::check()) {
-        return app()->call(\App\Livewire\Homepage::class);
+        // resources/views/guest/dashboard.blade.php
+        return view('guest.dashboard');
     }
 
     // Jika sudah login → masuk sesuai role
@@ -55,14 +46,22 @@ Route::get('/', function () {
         'admin' => redirect()->route('admin.dashboard'),
         'teacher' => redirect()->route('teacher.dashboard'),
         'student' => redirect()->route('student.dashboard'),
-        default => redirect()->route('courses.index'),
+        default => redirect()->route('home'),
     };
 })->name('home');
 
-// Katalog course (Livewire page)
-Route::get('/courses', CourseCatalog::class)->name('courses.index');
 
-// Detail course publik (pakai slug, ditangani StudentCourseController@show)
+// ==============================
+// KATALOG & DETAIL COURSE (PUBLIC + STUDENT)
+// ==============================
+
+// Katalog course → guest: view('guest.courses.index')
+//                 student: view('student.courses.catalog')
+Route::get('/courses', [StudentCourseController::class, 'catalog'])
+    ->name('courses.index');
+
+// Detail course → guest: view('guest.courses.show')
+//                student: view('student.courses.show')
 Route::get('/courses/{course:slug}', [StudentCourseController::class, 'show'])
     ->name('courses.show');
 
@@ -71,18 +70,19 @@ Route::get('/courses/{course:slug}', [StudentCourseController::class, 'show'])
 // ==============================
 require __DIR__ . '/auth.php';
 
+
 // ==============================
 // PROFILE (Breeze default)
 // ==============================
-
 Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+
 // ==============================
-// DASHBOARD (Breeze redirect by role)
+// DASHBOARD REDIRECT BY ROLE
 // ==============================
 
 Route::get('/dashboard', function () {
@@ -92,22 +92,14 @@ Route::get('/dashboard', function () {
         return redirect()->route('home');
     }
 
-    // Routing berdasarkan role
-    if ($user->role === 'admin') {
-        return redirect()->route('admin.dashboard');
-    }
-
-    if ($user->role === 'teacher') {
-        return redirect()->route('teacher.dashboard');
-    }
-
-    if ($user->role === 'student') {
-        return redirect()->route('student.dashboard');
-    }
-
-    // fallback kalau role tidak dikenali
-    return redirect()->route('home');
+    return match ($user->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'teacher' => redirect()->route('teacher.dashboard'),
+        'student' => redirect()->route('student.dashboard'),
+        default => redirect()->route('home'),
+    };
 })->middleware(['auth', 'active'])->name('dashboard');
+
 
 // ==============================
 // PROTECTED (auth) – ADMIN, TEACHER, STUDENT
@@ -124,7 +116,7 @@ Route::middleware(['auth', 'active'])->group(function () {
         ->group(function () {
             Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
                 ->name('dashboard');
-            // resources/views/admin/users/*
+
             Route::resource('users', AdminUserController::class);
 
             // resources/views/admin/categories/*
@@ -141,9 +133,6 @@ Route::middleware(['auth', 'active'])->group(function () {
         ->prefix('teacher')
         ->name('teacher.')
         ->group(function () {
-            Route::get('ping', function () {
-                return 'OK TEACHER';
-            })->name('ping');
             Route::get('/', [\App\Http\Controllers\Teacher\DashboardController::class, 'index'])
                 ->name('dashboard');
             // ------ COURSES ------
@@ -227,7 +216,7 @@ Route::middleware(['auth', 'active'])->group(function () {
                 // ------ ENROLL COURSE ------
                 Route::post('courses/{course}/enroll', [StudentCourseController::class, 'enroll'])
                     ->name('courses.enroll');
-                 // buka chat dengan guru tertentu
+                // buka chat dengan guru tertentu
                 Route::post('courses/{course}/discussion', [StudentDiscussionController::class, 'store'])
                     ->name('courses.discussion.store');
                 // ------ HALAMAN BELAJAR ------
@@ -239,7 +228,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('lessons/{lesson}/mark-done', [LessonController::class, 'markDone'])
                 ->name('lessons.mark-done');
 
-           
+
 
             Route::post('courses/{course}/chat', [StudentPrivateChatController::class, 'store'])
                 ->name('courses.chat.store');
@@ -260,6 +249,13 @@ Route::middleware(['auth', 'active'])->group(function () {
             // SERTIFIKAT BERDASARKAN COURSE (opsional)
             Route::get('courses/{course}/certificate', [StudentCertificateController::class, 'showByCourse'])
                 ->name('courses.certificate.show');
+            Route::get('contents/{content}/download', [StudentContentController::class, 'download'])
+                ->name('contents.download');
 
+            Route::get('contents/{content}/stream', [StudentContentController::class, 'stream'])
+                ->name('contents.stream');
+
+            Route::get('contents/{content}/image', [StudentContentController::class, 'image'])
+                ->name('contents.image');
         });
 });

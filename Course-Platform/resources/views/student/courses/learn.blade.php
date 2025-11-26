@@ -26,19 +26,20 @@
 
                                         <li class="mb-1">
                                             <a href="{{ route('student.courses.learn', [$course->id, 'lesson' => $l->id]) }}"
-                                                class="d-flex align-items-center p-2 rounded-3 small
-                                                       @if($active)
-                                                        bg-primary text-white fw-semibold
-                                                       @elseif($isDone)
-                                                        bg-success-subtle text-success border border-success
-                                                       @else
-                                                        bg-light text-dark
-                                                       @endif"
-                                                style="text-decoration:none; border-left: 4px solid {{ $isDone ? '#198754' : 'transparent' }};">
+                                               class="d-flex align-items-center p-2 rounded-3 small
+                                                   @if($active)
+                                                       bg-primary text-white fw-semibold
+                                                   @elseif($isDone)
+                                                       bg-success-subtle text-success border border-success
+                                                   @else
+                                                       bg-light text-dark
+                                                   @endif"
+                                               style="text-decoration:none; border-left: 4px solid {{ $isDone ? '#198754' : 'transparent' }};">
+
                                                 {{-- titik hijau kecil di kiri kalau sudah selesai --}}
                                                 @if($isDone)
                                                     <span class="me-2 rounded-circle"
-                                                        style="width:8px; height:8px; background-color:#198754;"></span>
+                                                          style="width:8px; height:8px; background-color:#198754;"></span>
                                                 @else
                                                     <span class="me-2" style="width:8px; height:8px;"></span>
                                                 @endif
@@ -94,26 +95,67 @@
                                     </div>
                                 @endif
 
-                                {{-- FILE --}}
+                                {{-- FILE (dokumen / gambar) --}}
                                 @if($content->type === 'file')
-                                    <div class="mb-4">
-                                        <h6 class="fw-semibold">{{ $content->title }}</h6>
-                                        <a href="{{ Storage::url($content->file_path) }}" class="btn btn-outline-primary btn-sm"
-                                            target="_blank">
-                                            <i class="bi bi-file-earmark-arrow-down me-1"></i> Unduh File
-                                        </a>
-                                    </div>
+                                    @php
+                                        $extension = $content->file_path
+                                            ? strtolower(pathinfo($content->file_path, PATHINFO_EXTENSION))
+                                            : null;
+                                        $isImage = in_array($extension, ['jpg','jpeg','png','webp']);
+                                    @endphp
+
+                                    {{-- Kalau file adalah gambar --}}
+                                    @if($isImage)
+                                        <div class="mb-4">
+                                            @if($content->title)
+                                                <h6 class="fw-semibold mb-2">{{ $content->title }}</h6>
+                                            @endif
+
+                                            @if($content->file_path)
+                                                <img src="{{ route('student.contents.image', $content) }}"
+                                                     alt="{{ $content->title ?? 'Gambar materi' }}"
+                                                     class="img-fluid rounded-3 border mb-2">
+                                            @else
+                                                <p class="small text-danger mb-0">Gambar belum tersedia.</p>
+                                            @endif
+                                        </div>
+                                    @else
+                                        {{-- Kalau file dokumen biasa --}}
+                                        <div class="mb-4">
+                                            @if($content->title)
+                                                <h6 class="fw-semibold mb-2">{{ $content->title }}</h6>
+                                            @endif
+
+                                            @if($content->file_path)
+                                                <a href="{{ route('student.contents.download', $content) }}"
+                                                   class="btn btn-outline-primary btn-sm">
+                                                    <i class="bi bi-file-earmark-arrow-down me-1"></i>
+                                                    Unduh File
+                                                </a>
+                                            @else
+                                                <p class="small text-danger mb-0">File belum tersedia.</p>
+                                            @endif
+                                        </div>
+                                    @endif
                                 @endif
 
                                 {{-- VIDEO --}}
                                 @if($content->type === 'video')
                                     <div class="mb-4">
-                                        <h6 class="fw-semibold">{{ $content->title }}</h6>
-                                        <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
-                                            <video controls class="w-100 h-100">
-                                                <source src="{{ Storage::url($content->video_path) }}" type="video/mp4">
-                                            </video>
-                                        </div>
+                                        @if($content->title)
+                                            <h6 class="fw-semibold mb-2">{{ $content->title }}</h6>
+                                        @endif
+
+                                        @if($content->video_path)
+                                            <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
+                                                <video controls class="w-100 h-100">
+                                                    <source src="{{ route('student.contents.stream', $content) }}" type="video/mp4">
+                                                    Browser Anda tidak mendukung pemutar video.
+                                                </video>
+                                            </div>
+                                        @else
+                                            <p class="small text-danger mb-0">Video belum tersedia.</p>
+                                        @endif
                                     </div>
                                 @endif
 
@@ -126,8 +168,9 @@
                             <hr>
 
                             {{-- ===== BUTTON MARK AS DONE ===== --}}
-                            <form action="{{ route('student.lessons.mark-done', $currentLesson) }}" method="POST"
-                                class="mb-3">
+                            <form action="{{ route('student.lessons.mark-done', $currentLesson) }}"
+                                  method="POST"
+                                  class="mb-3">
                                 @csrf
                                 <button class="btn btn-success">
                                     <i class="bi bi-check2-circle me-1"></i>
@@ -143,7 +186,7 @@
                                 @endphp
                                 @if($prev)
                                     <a class="btn btn-outline-secondary btn-sm"
-                                        href="{{ route('student.courses.learn', [$course->id, 'lesson' => $prev->id]) }}">
+                                       href="{{ route('student.courses.learn', [$course->id, 'lesson' => $prev->id]) }}">
                                         <i class="bi bi-arrow-left me-1"></i> Sebelumnya
                                     </a>
                                 @else
@@ -156,7 +199,7 @@
                                 @endphp
                                 @if($next)
                                     <a class="btn btn-primary btn-sm"
-                                        href="{{ route('student.courses.learn', [$course->id, 'lesson' => $next->id]) }}">
+                                       href="{{ route('student.courses.learn', [$course->id, 'lesson' => $next->id]) }}">
                                         Selanjutnya <i class="bi bi-arrow-right ms-1"></i>
                                     </a>
                                 @endif
@@ -178,7 +221,6 @@
                 {{-- LIVE CHAT DI BAWAH KONTEN --}}
                 {{-- ========================= --}}
                 <div class="row g-3 mt-3">
-
                     <div class="col-lg-6">
                         {{-- Chat Kelas tanpa Livewire --}}
                         @include('components.course-discussion-box', ['course' => $course])

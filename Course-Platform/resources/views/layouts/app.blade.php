@@ -181,8 +181,7 @@
 
 <footer class="border-top py-3" data-aos="fade-up" data-aos-duration="500">
     <div class="container d-flex flex-wrap justify-content-between gap-2">
-        <span>&copy; {{ date('Y') }} EDVO – EDUCATION VIRTUAL ONLINE.</span>
-        <span>Made with <span class="text-danger">&hearts;</span> & Bootstrap 5.</span>
+        <span>&copy; {{ date('Y') }} EDVO – EDUCATION VIRTUAL ONLINE.</span>        
     </div>
 </footer>
 

@@ -66,6 +66,8 @@
         }
         .progress-bar-brand {
             background: #0F3D73;
+             height: 100%;        /* ⬅️ ini penting */
+            transition: width .25s ease;
         }
 
         .badge-status {

@@ -1,4 +1,4 @@
-<x-app-layout :title="$course->title.' – EDVO'">
+<x-app-layout :title="$course->title . ' – EDVO'">
     <div class="container py-4">
         <div class="row g-4">
             <div class="col-lg-8">
@@ -49,7 +49,7 @@
                 <div class="card border-0 shadow-sm rounded-4 mb-3">
                     <div class="card-body">
                         <div class="ratio ratio-16x9 rounded-3 mb-3"
-                             style="background:linear-gradient(135deg,#93c5fd,#1d4ed8);">
+                            style="background:linear-gradient(135deg,#93c5fd,#1d4ed8);">
                             <div class="d-flex justify-content-center align-items-center text-white">
                                 <i class="bi bi-play-circle-fill fs-1"></i>
                             </div>
@@ -70,13 +70,12 @@
                         @else
                             @if(auth()->user()->isStudent())
                                 @if(auth()->user()->enrolledCourses->contains($course->id))
-                                    <a href="{{ route('student.courses.learn',$course) }}"
-                                       class="btn btn-success w-100 mb-2">
+                                    <a href="{{ route('student.courses.learn', $course) }}" class="btn btn-success w-100 mb-2">
                                         <i class="bi bi-play-circle me-1"></i>
                                         Lanjutkan Belajar
                                     </a>
                                 @else
-                                    <form action="{{ route('student.courses.enroll',$course) }}" method="POST" class="mb-2">
+                                    <form action="{{ route('student.courses.enroll', $course) }}" method="POST" class="mb-2">
                                         @csrf
                                         <button class="btn btn-primary w-100">
                                             <i class="bi bi-plus-circle me-1"></i>
@@ -99,7 +98,7 @@
                         <h2 class="h6 mb-3">Info kursus</h2>
                         <p class="mb-1">
                             <i class="bi bi-clock-history me-2"></i>
-                            {{ $course->modules->sum(fn($m)=>$m->lessons->count()) }} lesson
+                            {{ $course->modules->sum(fn($m) => $m->lessons->count()) }} lesson
                         </p>
                         <p class="mb-1">
                             <i class="bi bi-patch-question me-2"></i>
@@ -109,6 +108,34 @@
                             <i class="bi bi-chat-dots me-2"></i>
                             Forum diskusi & live chat
                         </p>
+                        <div class="border-top pt-3 mt-2">
+                            <p class="mb-1">
+                                <i class="bi bi-calendar-event me-2"></i>
+                                <strong>Mulai:</strong>
+                                {{ $course->start_date ? $course->start_date->translatedFormat('d F Y') : 'Tidak ditentukan' }}
+                            </p>
+
+                            <p class="mb-0">
+                                <i class="bi bi-calendar-check me-2"></i>
+                                <strong>Selesai:</strong>
+                                {{ $course->end_date ? $course->end_date->translatedFormat('d F Y') : 'Tidak ditentukan' }}
+                            </p>
+                            <p class="mb-0">
+                                <i class="bi bi-power me-2"></i>
+                                <strong>Status:</strong>
+
+                                @if($course->is_active)
+                                    <span class="badge bg-success-subtle text-success">
+                                        <i class="bi bi-check-circle me-1"></i> Aktif
+                                    </span>
+                                @else
+                                    <span class="badge bg-danger-subtle text-danger">
+                                        <i class="bi bi-x-circle me-1"></i> Tidak Aktif
+                                    </span>
+                                @endif
+                            </p>
+
+                        </div>
                     </div>
                 </div>
             </div>

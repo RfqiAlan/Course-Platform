@@ -23,4 +23,12 @@ class Content extends Model
     {
         return $this->belongsTo(Lesson::class);
     }
+     public function getFileUrlAttribute()
+    {
+        return $this->file_path ? Storage::url($this->file_path) : null;
+    }
+     public function getVideoUrlAttribute()
+    {
+        return $this->video_path ? Storage::url($this->video_path) : null;
+    }
 }

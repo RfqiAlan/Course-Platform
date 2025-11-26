@@ -65,7 +65,7 @@
                         </p>
                         <p class="small mb-0 text-muted">
                             <i class="bi bi-chat-dots me-1 text-primary"></i>
-                            Diskusu kelas aktif untuk course ini.
+                            Diskusi kelas aktif untuk course ini.
                         </p>
                     </div>
                 </div>

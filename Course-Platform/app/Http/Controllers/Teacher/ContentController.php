@@ -38,10 +38,13 @@ class ContentController extends Controller
         abort_unless($module->course_id === $course->id, 404);
         abort_unless($lesson->module_id === $module->id, 404);
 
+        $nextOrder = ($lesson->contents()->max('order') ?? 0) + 1;
+
         return view('teacher.contents.create', [
-            'course' => $course,
-            'module' => $module,
-            'lesson' => $lesson,
+            'course'    => $course,
+            'module'    => $module,
+            'lesson'    => $lesson,
+            'nextOrder' => $nextOrder,
         ]);
     }
 
@@ -55,30 +58,60 @@ class ContentController extends Controller
         abort_unless($module->course_id === $course->id, 404);
         abort_unless($lesson->module_id === $module->id, 404);
 
+        // validasi dasar
         $data = $request->validate([
-            'type' => 'required|in:text,file,video',
+            'type'  => 'required|in:text,file,video', // enum di DB masih text|file|video
             'title' => 'nullable|string|max:255',
-            'body' => 'nullable|string',
-            'file_path' => 'nullable|file',
-            'video_path' => 'nullable|file',
+            'body'  => 'nullable|string',
+            'file'  => 'nullable|file',
+            'video' => 'nullable|file',
             'order' => 'nullable|integer',
         ]);
 
-        // jika order kosong, set max+1
+        // jika type text → body wajib
+        if ($request->type === 'text') {
+            $request->validate([
+                'body' => 'required|string',
+            ]);
+        }
+
+        // jika type file → bisa dokumen DAN gambar (jpg/png/webp)
+        if ($request->type === 'file') {
+            $request->validate([
+                'file' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,zip,rar,jpg,jpeg,png,webp|max:51200',
+            ]);
+        }
+
+        // jika type video → video wajib
+        if ($request->type === 'video') {
+            $request->validate([
+                'video' => 'required|file|mimetypes:video/mp4,video/quicktime|max:204800',
+            ]);
+        }
+
+        // order otomatis kalau kosong
         if (!isset($data['order']) || $data['order'] === '' || $data['order'] === null) {
-            $maxOrder = $lesson->contents()->max('order');
+            $maxOrder      = $lesson->contents()->max('order');
             $data['order'] = ($maxOrder ?? 0) + 1;
         }
 
-        if ($request->hasFile('file_path')) {
-            $data['file_path'] = $request->file('file_path')->store('course/files', 'public');
+        // file materi (bisa dokumen / gambar)
+        if ($request->hasFile('file')) {
+            $data['file_path'] = $request->file('file')->store('course/files', 'public');
+        } else {
+            $data['file_path'] = null;
         }
 
-        if ($request->hasFile('video_path')) {
-            $data['video_path'] = $request->file('video_path')->store('course/videos', 'public');
+        // video
+        if ($request->hasFile('video')) {
+            $data['video_path'] = $request->file('video')->store('course/videos', 'public');
+        } else {
+            $data['video_path'] = null;
         }
 
         $data['lesson_id'] = $lesson->id;
+
+        unset($data['file'], $data['video']);
 
         Content::create($data);
 
@@ -121,36 +154,57 @@ class ContentController extends Controller
         $this->authorizeCourse($course);
 
         $data = $request->validate([
-            'type' => 'required|in:text,file,video',
+            'type'  => 'required|in:text,file,video',
             'title' => 'nullable|string|max:255',
-            'body' => 'nullable|string',
-            'file_path' => 'nullable|file',
-            'video_path' => 'nullable|file',
+            'body'  => 'nullable|string',
+            'file'  => 'nullable|file',
+            'video' => 'nullable|file',
             'order' => 'nullable|integer',
         ]);
 
-        if ($request->hasFile('file_path')) {
+        if ($request->type === 'text') {
+            $request->validate([
+                'body' => 'required|string',
+            ]);
+        }
+
+        if ($request->type === 'file' && $request->hasFile('file')) {
+            $request->validate([
+                'file' => 'file|mimes:pdf,doc,docx,ppt,pptx,zip,rar,jpg,jpeg,png,webp|max:51200',
+            ]);
+        }
+
+        if ($request->type === 'video' && $request->hasFile('video')) {
+            $request->validate([
+                'video' => 'file|mimetypes:video/mp4,video/quicktime|max:204800',
+            ]);
+        }
+
+        // handle file (dokumen / gambar)
+        if ($request->hasFile('file')) {
             if ($content->file_path) {
                 Storage::disk('public')->delete($content->file_path);
             }
-            $data['file_path'] = $request->file('file_path')->store('course/files', 'public');
+            $data['file_path'] = $request->file('file')->store('course/files', 'public');
         }
 
-        if ($request->hasFile('video_path')) {
+        // handle video
+        if ($request->hasFile('video')) {
             if ($content->video_path) {
                 Storage::disk('public')->delete($content->video_path);
             }
-            $data['video_path'] = $request->file('video_path')->store('course/videos', 'public');
+            $data['video_path'] = $request->file('video')->store('course/videos', 'public');
         }
 
-        // kalau order diubah jadi kosong, auto lagi
+        // order otomatis kalau kosong
         if (!isset($data['order']) || $data['order'] === '' || $data['order'] === null) {
-            $maxOrder = $lesson->contents()
+            $maxOrder      = $lesson->contents()
                 ->where('id', '!=', $content->id)
                 ->max('order');
-
             $data['order'] = ($maxOrder ?? 0) + 1;
         }
+
+        unset($data['file'], $data['video']);
 
         $content->update($data);
 

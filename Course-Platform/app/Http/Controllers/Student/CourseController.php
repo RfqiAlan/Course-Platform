@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\Category; // ✅ tambah ini
 use Illuminate\Http\Request;
 use App\Models\LessonUserProgress;
 
@@ -16,6 +17,67 @@ class CourseController extends Controller
         $course->load('category', 'teacher', 'modules.lessons', 'students');
 
         return view('courses.show', compact('course'));
+    }
+
+    /**
+     * Katalog kursus (untuk guest & student) – pengganti Livewire CourseCatalog
+     * Route: GET /courses  ->  name: courses.index
+     */
+    public function catalog(Request $request)
+    {
+        // Ambil parameter dari query string (?search=...&category_id=...&my_only=1)
+        $search     = $request->query('search', '');
+        $categoryId = $request->query('category_id', '');
+        $myOnly     = $request->boolean('my_only'); // true kalau ?my_only=1
+
+        // Ambil semua kategori untuk filter
+        $categories = Category::orderBy('name')->get();
+
+        // Query course (mirip dengan yang ada di Livewire)
+        $query = Course::with(['teacher', 'category'])
+            ->withCount('students');
+
+        // Filter search
+        if ($search) {
+            $q = '%' . $search . '%';
+            $query->where(function ($sub) use ($q) {
+                $sub->where('title', 'like', $q)
+                    ->orWhereHas('teacher', function ($teacherQuery) use ($q) {
+                        $teacherQuery->where('name', 'like', $q);
+                    });
+            });
+        }
+
+        // Filter kategori
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        // Filter "My Only" (hanya kursus yang diikuti student ini)
+        if ($myOnly && auth()->check()) {
+            $user = auth()->user();
+
+            // Kalau kamu punya method isStudent() di model User:
+            if (method_exists($user, 'isStudent') && $user->isStudent()) {
+                $userId = $user->id;
+
+                $query->whereHas('students', function ($q) use ($userId) {
+                    $q->where('users.id', $userId);
+                });
+            }
+        }
+
+        // Pagination (9 per halaman, dan query string dipertahankan)
+        $courses = $query->paginate(9)->withQueryString();
+
+        // View umum untuk katalog (non-Livewire)
+        return view('courses.catalog', [
+            'courses'     => $courses,
+            'categories'  => $categories,
+            'search'      => $search,
+            'categoryId'  => $categoryId,
+            'myOnly'      => $myOnly,
+        ]);
     }
 
     // tambahkan use di atas kalau belum
@@ -87,6 +149,7 @@ class CourseController extends Controller
         return redirect()->route('student.courses.learn', $course)
             ->with('success', 'Berhasil mendaftar course.');
     }
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -134,7 +197,6 @@ class CourseController extends Controller
         ]);
     }
 
-
     public function learn(Request $request, Course $course)
     {
         $user = auth()->user();
@@ -176,6 +238,4 @@ class CourseController extends Controller
             'doneLessonIds' => $doneLessonIds,
         ]);
     }
-
-
 }
