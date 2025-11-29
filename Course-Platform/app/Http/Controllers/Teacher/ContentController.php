@@ -95,7 +95,7 @@ class ContentController extends Controller
             $data['order'] = ($maxOrder ?? 0) + 1;
         }
 
-        // file materi (bisa dokumen / gambar)
+        // file materi (dokumen / gambar)
         if ($request->hasFile('file')) {
             $data['file_path'] = $request->file('file')->store('course/files', 'public');
         } else {
@@ -249,10 +249,24 @@ class ContentController extends Controller
     }
 
     /**
-     * Hanya teacher pemilik course yang boleh akses.
+     * Akses course:
+     * - Admin  : boleh semua
+     * - Teacher: hanya course yang dia ajar
      */
     protected function authorizeCourse(Course $course): void
     {
-        abort_unless($course->teacher_id === auth()->id(), 403);
+        $user = auth()->user();
+
+        // Admin boleh semua course
+        if ($user->role === 'admin') {
+            return;
+        }
+
+        // Teacher hanya course miliknya
+        if ($user->role === 'teacher' && $course->teacher_id === $user->id) {
+            return;
+        }
+
+        abort(403);
     }
 }

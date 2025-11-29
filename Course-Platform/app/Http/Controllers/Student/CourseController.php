@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Lesson;
-use App\Models\Category; // ✅ tambah ini
-use Illuminate\Http\Request;
+use App\Models\Category;
 use App\Models\LessonUserProgress;
+use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
-    // detail course untuk student (kalau kamu tidak pakai controller public terpisah)
+    // DETAIL COURSE (versi sederhana, silakan sesuaikan view kalau perlu)
     public function show(Course $course)
     {
         $course->load('category', 'teacher', 'modules.lessons', 'students');
@@ -20,24 +20,21 @@ class CourseController extends Controller
     }
 
     /**
-     * Katalog kursus (untuk guest & student) – pengganti Livewire CourseCatalog
+     * Katalog kursus (guest & student)
      * Route: GET /courses  ->  name: courses.index
      */
     public function catalog(Request $request)
     {
-        // Ambil parameter dari query string (?search=...&category_id=...&my_only=1)
         $search     = $request->query('search', '');
         $categoryId = $request->query('category_id', '');
-        $myOnly     = $request->boolean('my_only'); // true kalau ?my_only=1
+        $myOnly     = $request->boolean('my_only');
 
-        // Ambil semua kategori untuk filter
         $categories = Category::orderBy('name')->get();
 
-        // Query course (mirip dengan yang ada di Livewire)
         $query = Course::with(['teacher', 'category'])
             ->withCount('students');
 
-        // Filter search
+        // filter search
         if ($search) {
             $q = '%' . $search . '%';
             $query->where(function ($sub) use ($q) {
@@ -48,16 +45,15 @@ class CourseController extends Controller
             });
         }
 
-        // Filter kategori
+        // filter kategori
         if ($categoryId) {
             $query->where('category_id', $categoryId);
         }
 
-        // Filter "My Only" (hanya kursus yang diikuti student ini)
+        // filter "kursus saya"
         if ($myOnly && auth()->check()) {
             $user = auth()->user();
 
-            // Kalau kamu punya method isStudent() di model User:
             if (method_exists($user, 'isStudent') && $user->isStudent()) {
                 $userId = $user->id;
 
@@ -67,10 +63,8 @@ class CourseController extends Controller
             }
         }
 
-        // Pagination (9 per halaman, dan query string dipertahankan)
         $courses = $query->paginate(9)->withQueryString();
 
-        // View umum untuk katalog (non-Livewire)
         return view('courses.catalog', [
             'courses'     => $courses,
             'categories'  => $categories,
@@ -80,36 +74,29 @@ class CourseController extends Controller
         ]);
     }
 
-    // tambahkan use di atas kalau belum
-
+    // DASHBOARD STUDENT
     public function dashboard(Request $request)
     {
         $user = $request->user();
 
-        // === Query course yang di-enroll student ini ===
         $enrolledQuery = $user->enrolledCourses()
-            ->with(['category', 'teacher', 'modules.lessons']); // penting untuk hitung progress
+            ->with(['category', 'teacher', 'modules.lessons']);
 
-        // 1) Jumlah course diikuti
         $enrolledCount = (clone $enrolledQuery)->count();
 
-        // 2) Jumlah course selesai (pakai pivot is_completed)
         $completedCount = (clone $enrolledQuery)
             ->wherePivot('is_completed', true)
             ->count();
 
-        // 3) Jumlah sertifikat
         $certCount = $user->certificates()->count();
 
-        // 4) Ambil beberapa course terakhir + hitung progress
         $recentCourses = (clone $enrolledQuery)
             ->orderByDesc('course_student.updated_at')
             ->take(3)
             ->get()
             ->map(function ($course) use ($user) {
-                // kumpulkan semua lesson di course ini
                 $lessonIds = $course->modules
-                    ->flatMap(fn($m) => $m->lessons)
+                    ->flatMap(fn ($m) => $m->lessons)
                     ->pluck('id');
 
                 $totalLessons = $lessonIds->count();
@@ -129,13 +116,14 @@ class CourseController extends Controller
             });
 
         return view('student.dashboard', [
-            'enrolledCount' => $enrolledCount,
+            'enrolledCount'  => $enrolledCount,
             'completedCount' => $completedCount,
-            'certCount' => $certCount,
-            'recentCourses' => $recentCourses,
+            'certCount'      => $certCount,
+            'recentCourses'  => $recentCourses,
         ]);
     }
 
+    // ENROLL COURSE
     public function enroll(Course $course)
     {
         $user = auth()->user();
@@ -146,17 +134,18 @@ class CourseController extends Controller
             ],
         ]);
 
-        return redirect()->route('student.courses.learn', $course)
+        return redirect()->route('student.courses.learn', ['course' => $course->id])
             ->with('success', 'Berhasil mendaftar course.');
     }
 
+    // LIST COURSE YANG DIAMBIL STUDENT
     public function index(Request $request)
     {
         $user = $request->user();
 
         if (method_exists($user, 'enrolledCourses')) {
             $courses = $user->enrolledCourses()
-                ->with(['category', 'modules.lessons'])   // load category + semua modul & lesson
+                ->with(['category', 'modules.lessons'])
                 ->latest()
                 ->get();
         } else {
@@ -168,10 +157,9 @@ class CourseController extends Controller
                 ->get();
         }
 
-        // Hitung progress untuk tiap course
         foreach ($courses as $course) {
             $lessonIds = $course->modules
-                ->flatMap(fn($m) => $m->lessons)
+                ->flatMap(fn ($m) => $m->lessons)
                 ->pluck('id')
                 ->values();
 
@@ -188,7 +176,6 @@ class CourseController extends Controller
                 $course->progress_percent = 0;
             }
 
-            // Biar gampang dipakai di Blade:
             $course->is_completed = (bool) ($course->pivot->is_completed ?? false);
         }
 
@@ -197,45 +184,108 @@ class CourseController extends Controller
         ]);
     }
 
+    /**
+     * HALAMAN BELAJAR + REGULASI MARK AS DONE
+     * Route: GET /student/courses/{course}/learn  →  student.courses.learn
+     * Query: ?lesson={lesson_id} (opsional)
+     */
     public function learn(Request $request, Course $course)
     {
-        $user = auth()->user();
+        $user = $request->user();
 
-        // pastikan user sudah enroll course ini
-        abort_unless($user->enrolledCourses->contains($course->id), 403);
+        // Pastikan user sudah enroll
+        if (
+            ! method_exists($user, 'enrolledCourses') ||
+            ! $user->enrolledCourses()->where('course_id', $course->id)->exists()
+        ) {
+            abort(403);
+        }
 
-        // load modul + lesson + contents
-        $course->load('modules.lessons.contents');
+        // Load modul + lesson + contents dengan urutan
+        $course->load([
+            'modules' => function ($q) {
+                $q->orderBy('order');
+            },
+            'modules.lessons' => function ($q) {
+                $q->orderBy('order')->with('contents');
+            },
+        ]);
 
-        // kumpulkan semua lesson dalam course ini
+        // Kumpulkan semua lesson dalam satu list linear
         $allLessons = $course->modules
-            ->flatMap(fn($m) => $m->lessons)
+            ->flatMap(fn ($m) => $m->lessons)
             ->values();
 
+        // Kalau belum ada lesson sama sekali
+        if ($allLessons->isEmpty()) {
+            return view('student.courses.learn', [
+                'course'           => $course,
+                'currentLesson'    => null,
+                'doneLessonIds'    => [],
+                'allowedLessonIds' => [],
+            ]);
+        }
+
+        // Semua lesson_id
         $lessonIds = $allLessons->pluck('id')->values();
 
-        // ambil id lesson yang SUDAH SELESAI untuk user ini
+        // Lesson yang SUDAH selesai oleh user ini
         $doneLessonIds = LessonUserProgress::where('user_id', $user->id)
             ->whereIn('lesson_id', $lessonIds)
             ->where('is_done', true)
             ->pluck('lesson_id')
             ->toArray();
 
-        // pilih lesson aktif dari query ?lesson=
+        // Lesson yang diminta dari query ?lesson=
+        $requestedLessonId = $request->query('lesson');
         $currentLesson = null;
-        if ($lessonId = $request->query('lesson')) {
-            $currentLesson = $allLessons->firstWhere('id', (int) $lessonId);
+
+        if ($requestedLessonId && $lessonIds->contains((int) $requestedLessonId)) {
+            $currentLesson = $allLessons->firstWhere('id', (int) $requestedLessonId);
         }
 
-        // fallback: kalau tidak ada / id tidak cocok → pakai lesson pertama
-        if (!$currentLesson) {
-            $currentLesson = $allLessons->first();
+        // Fallback:
+        // - pakai lesson pertama yang belum selesai
+        // - kalau semua sudah selesai → pakai lesson pertama
+        if (! $currentLesson) {
+            $firstNotDone = $allLessons->first(function ($l) use ($doneLessonIds) {
+                return ! in_array($l->id, $doneLessonIds);
+            });
+
+            $currentLesson = $firstNotDone ?: $allLessons->first();
+        }
+
+        // ===============================
+        // TENTUKAN LESSON YANG BOLEH DIAKSES
+        // ===============================
+        $allowedLessonIds = [];
+        $firstLockedFound = false;
+
+        foreach ($allLessons as $lesson) {
+            if (in_array($lesson->id, $doneLessonIds)) {
+                // Lesson yang sudah selesai → boleh diakses ulang
+                $allowedLessonIds[] = $lesson->id;
+                continue;
+            }
+
+            if (! $firstLockedFound) {
+                // Lesson pertama yang belum selesai → boleh diakses (target berikut)
+                $allowedLessonIds[] = $lesson->id;
+                $firstLockedFound = true;
+            }
+            // Lesson setelahnya tidak dimasukkan → terkunci
+        }
+
+        // Kalau user coba akses lesson yang belum diizinkan → paksa ke lesson pertama yang boleh
+        if (! in_array($currentLesson->id, $allowedLessonIds) && ! empty($allowedLessonIds)) {
+            $currentLesson = $allLessons->firstWhere('id', $allowedLessonIds[0]);
         }
 
         return view('student.courses.learn', [
-            'course' => $course,
-            'currentLesson' => $currentLesson,
-            'doneLessonIds' => $doneLessonIds,
+            'course'           => $course,
+            'currentLesson'    => $currentLesson,
+            'doneLessonIds'    => $doneLessonIds,
+            'allowedLessonIds' => $allowedLessonIds,
         ]);
     }
 }

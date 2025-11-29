@@ -11,21 +11,63 @@ use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
-    public function index()
+    /**
+     * List course + filter search, kategori, status.
+     * View  : resources/views/admin/courses/index.blade.php
+     * Route : admin.courses.index
+     */
+    public function index(Request $request)
     {
-        $courses = Course::with(['teacher','category'])
-            ->latest()
-            ->paginate(10);
+        // ambil parameter dari form (name="search", "category", "status")
+        $search     = $request->input('search');
+        $categoryId = $request->input('category');
+        $status     = $request->input('status'); // 'active' / 'inactive' / null
 
-        return view('admin.courses.index', compact('courses'));
+        $query = Course::with(['teacher', 'category'])
+            ->latest();
+
+        // FILTER: search judul / nama teacher
+        if ($search) {
+            $q = '%' . $search . '%';
+
+            $query->where(function ($sub) use ($q) {
+                $sub->where('title', 'like', $q)
+                    ->orWhereHas('teacher', function ($teacherQuery) use ($q) {
+                        $teacherQuery->where('name', 'like', $q);
+                    });
+            });
+        }
+
+        // FILTER: kategori
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        // FILTER: status aktif / nonaktif
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
+        }
+
+        $courses = $query->paginate(10)->withQueryString();
+
+        // untuk dropdown filter kategori di Blade
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.courses.index', compact('courses', 'categories'));
     }
 
     public function create()
     {
-        $teachers   = User::where('role', 'teacher')->where('is_active', true)->get();
-        $categories = Category::all();
+        $teachers   = User::where('role', 'teacher')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.courses.create', compact('teachers','categories'));
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.courses.create', compact('teachers', 'categories'));
     }
 
     public function store(Request $request)
@@ -40,21 +82,26 @@ class CourseController extends Controller
             'is_active'   => 'nullable|boolean',
         ]);
 
-        $data['slug'] = Str::slug($data['title']) . '-' . Str::random(4);
+        $data['slug']      = Str::slug($data['title']) . '-' . Str::random(4);
         $data['is_active'] = $request->has('is_active');
 
         Course::create($data);
 
-        return redirect()->route('admin.courses.index')
+        return redirect()
+            ->route('admin.courses.index')
             ->with('success', 'Course berhasil dibuat.');
     }
 
     public function edit(Course $course)
     {
-        $teachers   = User::where('role', 'teacher')->where('is_active', true)->get();
-        $categories = Category::all();
+        $teachers = User::where('role', 'teacher')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.courses.edit', compact('course','teachers','categories'));
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.courses.edit', compact('course', 'teachers', 'categories'));
     }
 
     public function update(Request $request, Course $course)
@@ -69,6 +116,7 @@ class CourseController extends Controller
             'is_active'   => 'nullable|boolean',
         ]);
 
+        // regenerate slug kalau judul berubah
         if ($data['title'] !== $course->title) {
             $data['slug'] = Str::slug($data['title']) . '-' . Str::random(4);
         }
@@ -77,7 +125,8 @@ class CourseController extends Controller
 
         $course->update($data);
 
-        return redirect()->route('admin.courses.index')
+        return redirect()
+            ->route('admin.courses.index')
             ->with('success', 'Course berhasil diupdate.');
     }
 
@@ -85,7 +134,8 @@ class CourseController extends Controller
     {
         $course->delete();
 
-        return redirect()->route('admin.courses.index')
+        return redirect()
+            ->route('admin.courses.index')
             ->with('success', 'Course berhasil dihapus.');
     }
 }

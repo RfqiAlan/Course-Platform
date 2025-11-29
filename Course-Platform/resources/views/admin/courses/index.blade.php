@@ -101,7 +101,7 @@
                                     <th>Kategori</th>
                                     <th>Status</th>
                                     <th class="text-center" style="width: 80px;">Siswa</th>
-                                    <th class="text-end" style="width: 150px;">Aksi</th>
+                                    <th class="text-end" style="width: 180px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="small">
@@ -110,7 +110,7 @@
                                         {{-- NOMOR --}}
                                         <td>{{ $loop->iteration + ($courses->firstItem() - 1) }}</td>
 
-                                        {{-- JUDUL + LINK --}}
+                                        {{-- JUDUL + LINK PUBLIC --}}
                                         <td>
                                             <div class="fw-semibold mb-0">
                                                 <a href="{{ route('courses.show', $course) }}"
@@ -124,7 +124,7 @@
                                             </div>
                                         </td>
 
-                                        {{-- TEACHER DENGAN AVATAR INISIAL --}}
+                                        {{-- TEACHER --}}
                                         <td>
                                             @if($course->teacher)
                                                 <div class="d-flex align-items-center gap-2">
@@ -177,16 +177,25 @@
 
                                         {{-- AKSI --}}
                                         <td class="text-end">
-                                            <a href="{{ route('admin.courses.edit', $course) }}"
-                                               class="btn btn-outline-secondary btn-sm me-1"
+                                            {{-- KELola MODUL & MATERI (AREA TEACHER) --}}
+                                            <a href="{{ route('teacher.courses.modules.index', ['course' => $course->id]) }}"
+                                               class="btn btn-outline-primary btn-sm me-1"
+                                               title="Kelola modul & materi">
+                                                <i class="bi bi-kanban"></i>
+                                            </a>
+
+                                            {{-- EDIT COURSE (META) --}}
+                                            <a href="{{ route('admin.courses.edit', $course) }}
+                                               "class="btn btn-outline-secondary btn-sm me-1"
                                                title="Edit course">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
 
+                                            {{-- HAPUS COURSE --}}
                                             <form action="{{ route('admin.courses.destroy', $course) }}"
                                                   method="POST"
                                                   class="d-inline"
-                                                  onsubmit="return confirm('Hapus course \"{{ $course->title }}\"? Modul/lesson yang terkait akan ikut terhapus. Lanjutkan?')">
+                                                  onsubmit="return confirm('Hapus course &quot;{{ $course->title }}&quot;? Modul/lesson yang terkait akan ikut terhapus. Lanjutkan?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"

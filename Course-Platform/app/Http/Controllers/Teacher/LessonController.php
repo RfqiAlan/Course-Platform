@@ -17,11 +17,12 @@ class LessonController extends Controller
      */
     public function index(Course $course, Module $module)
     {
-        // Boleh diaktifkan kalau mau ketat:
         $this->authorizeCourse($course);
         abort_unless($module->course_id === $course->id, 404);
 
-        $lessons = $module->lessons()->orderBy('order')->get();
+        $lessons = $module->lessons()
+            ->orderBy('order')
+            ->get();
 
         return view('teacher.lessons.index', compact('course', 'module', 'lessons'));
     }
@@ -152,10 +153,24 @@ class LessonController extends Controller
     }
 
     /**
-     * Hanya teacher pemilik course yang boleh akses.
+     * Akses course:
+     * - Admin  : boleh semua
+     * - Teacher: hanya course yang dia ajar
      */
     protected function authorizeCourse(Course $course): void
     {
-        abort_unless($course->teacher_id === auth()->id(), 403);
+        $user = auth()->user();
+
+        // Admin boleh semua course
+        if ($user->role === 'admin') {
+            return;
+        }
+
+        // Teacher hanya course miliknya
+        if ($user->role === 'teacher' && $course->teacher_id === $user->id) {
+            return;
+        }
+
+        abort(403);
     }
 }

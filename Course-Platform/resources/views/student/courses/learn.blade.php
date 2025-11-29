@@ -20,33 +20,47 @@
                                 <ul class="list-unstyled ms-3 mt-2">
                                     @foreach($m->lessons as $l)
                                         @php
-                                            $active = isset($currentLesson) && $l->id === $currentLesson->id;
-                                            $isDone = isset($doneLessonIds) && in_array($l->id, $doneLessonIds);
+                                            $active    = isset($currentLesson) && $l->id === $currentLesson->id;
+                                            $isDone    = isset($doneLessonIds) && in_array($l->id, $doneLessonIds);
+                                            $canAccess = isset($allowedLessonIds) && in_array($l->id, $allowedLessonIds);
                                         @endphp
 
                                         <li class="mb-1">
-                                            <a href="{{ route('student.courses.learn', [$course->id, 'lesson' => $l->id]) }}"
-                                               class="d-flex align-items-center p-2 rounded-3 small
-                                                   @if($active)
-                                                       bg-primary text-white fw-semibold
-                                                   @elseif($isDone)
-                                                       bg-success-subtle text-success border border-success
-                                                   @else
-                                                       bg-light text-dark
-                                                   @endif"
-                                               style="text-decoration:none; border-left: 4px solid {{ $isDone ? '#198754' : 'transparent' }};">
+                                            @if($canAccess)
+                                                {{-- BISA DIKLIK --}}
+                                                <a href="{{ route('student.courses.learn', [
+                                                        'course' => $course->id,
+                                                        'lesson' => $l->id
+                                                    ]) }}"
+                                                   class="d-flex align-items-center p-2 rounded-3 small
+                                                       @if($active)
+                                                           bg-primary text-white fw-semibold
+                                                       @elseif($isDone)
+                                                           bg-success-subtle text-success border border-success
+                                                       @else
+                                                           bg-light text-dark
+                                                       @endif"
+                                                   style="text-decoration:none; border-left: 4px solid {{ $isDone ? '#198754' : 'transparent' }};">
 
-                                                {{-- titik hijau kecil di kiri kalau sudah selesai --}}
-                                                @if($isDone)
-                                                    <span class="me-2 rounded-circle"
-                                                          style="width:8px; height:8px; background-color:#198754;"></span>
-                                                @else
+                                                    @if($isDone)
+                                                        <span class="me-2 rounded-circle"
+                                                              style="width:8px; height:8px; background-color:#198754;"></span>
+                                                    @else
+                                                        <span class="me-2" style="width:8px; height:8px;"></span>
+                                                    @endif
+
+                                                    <i class="bi bi-play-circle me-2"></i>
+                                                    <span class="text-truncate">{{ $l->title }}</span>
+                                                </a>
+                                            @else
+                                                {{-- TERKUNCI --}}
+                                                <div class="d-flex align-items-center p-2 rounded-3 small bg-light text-muted opacity-75"
+                                                     style="border-left: 4px solid transparent; cursor:not-allowed;">
                                                     <span class="me-2" style="width:8px; height:8px;"></span>
-                                                @endif
-
-                                                <i class="bi bi-play-circle me-2"></i>
-                                                <span class="text-truncate">{{ $l->title }}</span>
-                                            </a>
+                                                    <i class="bi bi-lock-fill me-2"></i>
+                                                    <span class="text-truncate">{{ $l->title }}</span>
+                                                </div>
+                                            @endif
                                         </li>
                                     @endforeach
                                 </ul>
@@ -66,6 +80,10 @@
 
                         @isset($currentLesson)
 
+                            @php
+                                $currentIsDone = isset($doneLessonIds) && in_array($currentLesson->id, $doneLessonIds);
+                            @endphp
+
                             {{-- ===== HEADER LESSON ===== --}}
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div>
@@ -73,7 +91,17 @@
                                         Lesson {{ $currentLesson->order }}
                                     </p>
                                     <h4 class="fw-bold mb-1">{{ $currentLesson->title }}</h4>
-                                    <p class="text-muted small">{{ $currentLesson->summary }}</p>
+                                    <p class="text-muted small mb-1">{{ $currentLesson->summary }}</p>
+
+                                    @if($currentIsDone)
+                                        <span class="badge bg-success-subtle text-success small mt-1">
+                                            <i class="bi bi-check2-circle me-1"></i> Sudah ditandai selesai
+                                        </span>
+                                    @else
+                                        <span class="badge bg-warning-subtle text-warning small mt-1">
+                                            <i class="bi bi-hourglass-split me-1"></i> Belum selesai
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
 
@@ -104,7 +132,6 @@
                                         $isImage = in_array($extension, ['jpg','jpeg','png','webp']);
                                     @endphp
 
-                                    {{-- Kalau file adalah gambar --}}
                                     @if($isImage)
                                         <div class="mb-4">
                                             @if($content->title)
@@ -120,7 +147,6 @@
                                             @endif
                                         </div>
                                     @else
-                                        {{-- Kalau file dokumen biasa --}}
                                         <div class="mb-4">
                                             @if($content->title)
                                                 <h6 class="fw-semibold mb-2">{{ $content->title }}</h6>
@@ -168,15 +194,27 @@
                             <hr>
 
                             {{-- ===== BUTTON MARK AS DONE ===== --}}
-                            <form action="{{ route('student.lessons.mark-done', $currentLesson) }}"
-                                  method="POST"
-                                  class="mb-3">
-                                @csrf
-                                <button class="btn btn-success">
-                                    <i class="bi bi-check2-circle me-1"></i>
-                                    Tandai Lesson Selesai
-                                </button>
-                            </form>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <form action="{{ route('student.lessons.mark-done', $currentLesson) }}"
+                                          method="POST" class="d-inline">
+                                        @csrf
+                                        <button class="btn btn-success btn-sm" @if($currentIsDone) disabled @endif>
+                                            <i class="bi bi-check2-circle me-1"></i>
+                                            @if($currentIsDone)
+                                                Sudah Ditandai Selesai
+                                            @else
+                                                Tandai Lesson Selesai
+                                            @endif
+                                        </button>
+                                    </form>
+                                    @if(!$currentIsDone)
+                                        <p class="small text-muted mb-0 mt-1">
+                                            Tandai selesai dulu untuk membuka tombol <strong>Selanjutnya</strong> dan lesson berikutnya.
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
 
                             {{-- ===== NEXT / PREVIOUS ===== --}}
                             <div class="d-flex justify-content-between">
@@ -186,7 +224,10 @@
                                 @endphp
                                 @if($prev)
                                     <a class="btn btn-outline-secondary btn-sm"
-                                       href="{{ route('student.courses.learn', [$course->id, 'lesson' => $prev->id]) }}">
+                                       href="{{ route('student.courses.learn', [
+                                            'course' => $course->id,
+                                            'lesson' => $prev->id
+                                       ]) }}">
                                         <i class="bi bi-arrow-left me-1"></i> Sebelumnya
                                     </a>
                                 @else
@@ -198,15 +239,24 @@
                                     $next = $course->getNextLesson($currentLesson);
                                 @endphp
                                 @if($next)
-                                    <a class="btn btn-primary btn-sm"
-                                       href="{{ route('student.courses.learn', [$course->id, 'lesson' => $next->id]) }}">
-                                        Selanjutnya <i class="bi bi-arrow-right ms-1"></i>
-                                    </a>
+                                    @if($currentIsDone)
+                                        <a class="btn btn-primary btn-sm"
+                                           href="{{ route('student.courses.learn', [
+                                                'course' => $course->id,
+                                                'lesson' => $next->id
+                                           ]) }}">
+                                            Selanjutnya <i class="bi bi-arrow-right ms-1"></i>
+                                        </a>
+                                    @else
+                                        <button class="btn btn-primary btn-sm" disabled>
+                                            Selanjutnya <i class="bi bi-lock ms-1"></i>
+                                        </button>
+                                    @endif
                                 @endif
                             </div>
 
                         @else
-                            {{-- ===== JIKA BELUM PILIH LESSON ===== --}}
+                            {{-- JIKA BELUM PILIH LESSON --}}
                             <div class="text-center py-5">
                                 <i class="bi bi-journal-bookmark fs-1 text-primary"></i>
                                 <h5 class="mt-3 fw-semibold">Pilih Lesson untuk Mulai Belajar</h5>
@@ -217,12 +267,9 @@
                     </div>
                 </div>
 
-                {{-- ========================= --}}
-                {{-- LIVE CHAT DI BAWAH KONTEN --}}
-                {{-- ========================= --}}
+                {{-- LIVE CHAT --}}
                 <div class="row g-3 mt-3">
                     <div class="col-lg-6">
-                        {{-- Chat Kelas tanpa Livewire --}}
                         @include('components.course-discussion-box', ['course' => $course])
                     </div>
                     <div class="col-lg-6">
@@ -233,5 +280,4 @@
             </div> {{-- /col-lg-9 --}}
         </div>
     </div>
-
 </x-app-layout>

@@ -1,77 +1,99 @@
-@php
-    use App\Models\DiscussionMessage;
+@props([
+    'course',
+    'discussions' => [],
+])
 
-    $messages = DiscussionMessage::where('course_id', $course->id)
-        ->with('user')
-        ->orderBy('created_at')
-        ->get();
+@php
+    $user = auth()->user();
+    $role = $user?->role;
 @endphp
 
-<div class="card border-0 shadow-sm rounded-4">
-    <div class="card-body p-3" style="height: 340px; display:flex; flex-direction:column;">
-
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="fw-semibold mb-0">Diskusi Kelas</h6>
-            <small class="text-muted">Course: {{ $course->title }}</small>
+{{-- Hanya teacher & student yang boleh melihat dan mengirim diskusi --}}
+@if(in_array($role, ['teacher', 'student']))
+    <div class="card border-0 shadow-sm rounded-4 mt-4">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="mb-0">Diskusi Kelas</h6>
+                <p class="text-muted small mb-0">
+                    Ruang tanya jawab seputar materi course <strong>{{ $course->title }}</strong>.
+                </p>
+            </div>
         </div>
 
-        {{-- AREA PESAN --}}
-        <div id="discussion-box"
-             class="flex-grow-1 overflow-auto mb-2 p-2 rounded-3"
-             style="background:#f9fafb; border:1px solid #eee;">
-
-            @forelse($messages as $msg)
-                @php
-                    $isMine = $msg->user_id === auth()->id();
-                @endphp
-
-                <div class="mb-2 d-flex {{ $isMine ? 'justify-content-end' : 'justify-content-start' }}">
-                    <div class="px-3 py-2 rounded-3"
-                         style="max-width:70%;
-                                background: {{ $isMine ? '#4f46e5' : '#e5e7eb' }};
-                                color: {{ $isMine ? 'white' : '#111827' }};">
-
-                        <small class="fw-semibold d-block" style="opacity:.9;">
-                            {{ $msg->user->name }}
-                        </small>
-
-                        <div class="small">
-                            {{ $msg->message }}
+        <div class="card-body" style="max-height: 320px; overflow-y: auto;">
+            @forelse($discussions as $discussion)
+                <div class="mb-3 pb-3 border-bottom border-light-subtle">
+                    <div class="d-flex align-items-center mb-1">
+                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-2"
+                             style="width: 28px; height: 28px; font-size: 0.75rem;">
+                            {{ strtoupper(substr($discussion->user->name ?? 'U', 0, 1)) }}
                         </div>
-
-                        <small class="d-block text-end mt-1" style="opacity:.6; font-size:10px;">
-                            {{ $msg->created_at->format('d M H:i') }}
-                        </small>
+                        <div>
+                            <div class="small fw-semibold">
+                                {{ $discussion->user->name ?? 'User' }}
+                                @if($discussion->user->role === 'teacher')
+                                    <span class="badge bg-indigo-100 text-indigo-700 border rounded-pill ms-1"
+                                          style="font-size: 9px;">
+                                        Teacher
+                                    </span>
+                                @elseif($discussion->user->role === 'student')
+                                    <span class="badge bg-emerald-100 text-emerald-700 border rounded-pill ms-1"
+                                          style="font-size: 9px;">
+                                        Student
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="text-muted xsmall">
+                                {{ $discussion->created_at?->diffForHumans() }}
+                            </div>
+                        </div>
                     </div>
+                    <p class="mb-0 small">
+                        {{ $discussion->message }}
+                    </p>
                 </div>
             @empty
-                <p class="text-muted small text-center my-3">
-                    Belum ada diskusi di kelas ini.
-                </p>
+                <div class="text-center text-muted small py-3">
+                    Belum ada diskusi. Mulai pertanyaan pertama kamu terkait materi course ini.
+                </div>
             @endforelse
         </div>
 
         {{-- FORM KIRIM DISKUSI --}}
-        <form action="{{ route(auth()->user()->role.'.courses.discussion.store', $course) }}"
-              method="POST"
-              class="d-flex gap-2">
-            @csrf
-            <input type="text"
-                   name="message"
-                   class="form-control rounded-pill"
-                   placeholder="Tulis diskusi..."
-                   required>
-            <button class="btn btn-primary rounded-pill px-4">
-                Kirim
-            </button>
-        </form>
-    </div>
-</div>
+        <div class="card-footer bg-light-subtle border-0">
+            @php
+                // Tentukan route form berdasarkan role
+                $discussionRoute = null;
 
-{{-- Auto scroll ke paling bawah --}}
-<script>
-    setTimeout(() => {
-        const box = document.getElementById('discussion-box');
-        if (box) box.scrollTop = box.scrollHeight;
-    }, 200);
-</script>
+                if ($role === 'teacher') {
+                    $discussionRoute = route('teacher.courses.discussion.store', $course);
+                } elseif ($role === 'student') {
+                    $discussionRoute = route('student.courses.discussion.store', $course);
+                }
+            @endphp
+
+            @if($discussionRoute)
+                <form action="{{ $discussionRoute }}" method="POST" class="d-flex align-items-start gap-2">
+                    @csrf
+                    <div class="flex-grow-1">
+                        <textarea
+                            name="message"
+                            rows="2"
+                            class="form-control form-control-sm @error('message') is-invalid @enderror"
+                            placeholder="Tulis pertanyaan atau komentar kamu di sini...">{{ old('message') }}</textarea>
+                        @error('message')
+                            <div class="invalid-feedback small">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="bi bi-send-fill me-1"></i> Kirim
+                        </button>
+                    </div>
+                </form>
+            @endif
+        </div>
+    </div>
+@endif

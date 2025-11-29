@@ -1,25 +1,31 @@
 <x-app-layout :title="'Modul: '.$course->title">
     <div class="container py-4">
-
+    @php
+    $backUrl = auth()->user()->role === 'admin'
+        ? route('admin.courses.index')
+        : route('teacher.courses.index');
+@endphp
         {{-- HEADER --}}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="h5 mb-1">Modul Kursus</h1>
-                <p class="small text-muted mb-0">
-                    Atur urutan modul & lesson untuk course: <strong>{{ $course->title }}</strong>
-                </p>
-            </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h5 mb-1">Modul Kursus</h1>
+        <p class="small text-muted mb-0">
+            Atur urutan modul & lesson untuk course: <strong>{{ $course->title }}</strong>
+        </p>
+    </div>
 
-            <div class="d-flex gap-2">
-                <a href="{{ route('teacher.courses.index') }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-arrow-left me-1"></i> Kembali
-                </a>
-                <a href="{{ route('teacher.courses.modules.create', ['course' => $course->id]) }}"
-                   class="btn btn-primary btn-sm">
-                    <i class="bi bi-plus-circle me-1"></i> Tambah Modul
-                </a>
-            </div>
-        </div>
+    <div class="d-flex gap-2">
+        {{-- BACK BUTTON DINAMIS --}}
+        <a href="{{ $backUrl }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Kembali
+        </a>
+
+        <a href="{{ route('teacher.courses.modules.create', ['course' => $course->id]) }}"
+           class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Tambah Modul
+        </a>
+    </div>
+</div>
 
         {{-- CARD --}}
         <div class="card border-0 shadow-sm rounded-4">

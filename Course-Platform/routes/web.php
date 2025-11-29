@@ -23,9 +23,9 @@ use App\Http\Controllers\Teacher\PrivateChatController as TeacherPrivateChatCont
 use App\Http\Controllers\Student\CourseController as StudentCourseController;
 use App\Http\Controllers\Student\CertificateController as StudentCertificateController;
 use App\Http\Controllers\Student\DiscussionController as StudentDiscussionController;
-use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\PrivateChatController as StudentPrivateChatController;
 use App\Http\Controllers\Student\ContentController as StudentContentController;
+use App\Http\Controllers\Student\LessonController as StudentLessonController;
 
 use App\Http\Controllers\LessonController;
 
@@ -129,7 +129,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     // ==========================
     // TEACHER
     // ==========================
-    Route::middleware('role:teacher')
+    Route::middleware('role:teacher,admin')
         ->prefix('teacher')
         ->name('teacher.')
         ->group(function () {
@@ -172,16 +172,20 @@ Route::middleware(['auth', 'active'])->group(function () {
             // teacher.courses.modules.lessons.contents.index
             // teacher.courses.modules.lessons.contents.create
             // teacher.contents.edit – shallow
-    
-            // buka chat dengan murid
-// DISKUSI KELAS (GURU)
+
+        // DISKUSI KELAS (GURU)
+       
             Route::post('courses/{course}/discussion', [TeacherDiscussionController::class, 'store'])
                 ->name('courses.discussion.store');
 
             // Opsional: halaman khusus melihat diskusi course
             Route::get('courses/{course}/discussion', [TeacherDiscussionController::class, 'index'])
                 ->name('courses.discussion');
-
+         });
+         Route::middleware('role:teacher')
+            ->prefix('teacher')
+            ->name('teacher.')
+            ->group(function () {
             Route::get('private-chats', [TeacherPrivateChatController::class, 'index'])
                 ->name('private-chats.index');
 
@@ -225,8 +229,8 @@ Route::middleware(['auth', 'active'])->group(function () {
                     ->name('courses.learn');
             });
             // ------ LESSON PROGRESS ------
-            Route::post('lessons/{lesson}/mark-done', [LessonController::class, 'markDone'])
-                ->name('lessons.mark-done');
+            Route::post('lessons/{lesson}/mark-done', [StudentLessonController::class, 'markDone'])
+            ->name('lessons.mark-done');
 
 
 

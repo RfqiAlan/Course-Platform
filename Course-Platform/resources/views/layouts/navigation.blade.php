@@ -35,6 +35,7 @@
 
                 {{-- MAIN LINKS (DESKTOP) --}}
                 <div class="hidden sm:flex items-center gap-1 rounded-full bg-slate-50/80 px-1.5 py-1 ring-1 ring-slate-100">
+
                     {{-- ===== BERANDA (AUTH / GUEST) ===== --}}
                     @if($user)
                         @php
@@ -82,9 +83,9 @@
                         </a>
                     @endguest
 
-                    {{-- Student → Kursus diikutI --}}
+                    {{-- Student → Kursus diikuti --}}
                     @auth
-                        @if($user && method_exists($user,'isStudent') && $user->isStudent())
+                        @if($user && ($user->role === 'student' || (method_exists($user,'isStudent') && $user->isStudent())))
                             @php
                                 $isStudentCourseActive = request()->routeIs('student.courses.*');
                             @endphp
@@ -127,28 +128,35 @@
                     </a>
                 @endguest
 
-                {{-- CTA STUDENT --}}
+                {{-- CTA PER ROLE --}}
                 @auth
-                    @if($user && method_exists($user,'isStudent') && $user->isStudent())
+                    {{-- STUDENT --}}
+                    @if($user->role === 'student' || (method_exists($user,'isStudent') && $user->isStudent()))
                         <a href="{{ route('student.courses.index') }}"
                            class="hidden md:inline-flex items-center rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-black transition">
                             Lanjutkan Belajar
                         </a>
                     @endif
 
-                    {{-- CTA TEACHER --}}
-                    @if($user && $user->role === 'teacher')
+                    {{-- TEACHER --}}
+                    @if($user->role === 'teacher')
                         <a href="{{ route('teacher.dashboard') }}"
                            class="hidden md:inline-flex items-center rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 transition">
                             Panel Pengajar
                         </a>
                     @endif
 
-                    {{-- CTA ADMIN --}}
-                    @if($user && $user->role === 'admin')
+                    {{-- ADMIN --}}
+                    @if($user->role === 'admin')
                         <a href="{{ route('admin.dashboard') }}"
                            class="hidden md:inline-flex items-center rounded-full bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-rose-700 transition">
                             Admin Panel
+                        </a>
+
+                        {{-- Admin boleh masuk ke area teacher untuk kelola materi --}}
+                        <a href="{{ route('teacher.dashboard') }}"
+                           class="hidden md:inline-flex items-center rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 transition">
+                            Kelola Materi
                         </a>
                     @endif
                 @endauth
@@ -281,7 +289,7 @@
                 </x-responsive-nav-link>
             @endguest
 
-            {{-- Kursus --}}
+            {{-- Kursus (Guest) --}}
             @guest
                 <x-responsive-nav-link
                     :href="route('courses.index')"
@@ -292,7 +300,8 @@
             @endguest
 
             @auth
-                @if($user && method_exists($user,'isStudent') && $user->isStudent())
+                {{-- STUDENT: Kursus Saya --}}
+                @if($user->role === 'student' || (method_exists($user,'isStudent') && $user->isStudent()))
                     <x-responsive-nav-link
                         :href="route('student.courses.index')"
                         :active="request()->routeIs('student.courses.*')"
@@ -301,7 +310,8 @@
                     </x-responsive-nav-link>
                 @endif
 
-                @if($user && $user->role === 'teacher')
+                {{-- TEACHER: Panel Pengajar --}}
+                @if($user->role === 'teacher')
                     <x-responsive-nav-link
                         :href="route('teacher.dashboard')"
                         :active="request()->routeIs('teacher.*')"
@@ -310,12 +320,20 @@
                     </x-responsive-nav-link>
                 @endif
 
-                @if($user && $user->role === 'admin')
+                {{-- ADMIN: Admin Panel + Kelola Materi --}}
+                @if($user->role === 'admin')
                     <x-responsive-nav-link
                         :href="route('admin.dashboard')"
                         :active="request()->routeIs('admin.*')"
                     >
                         {{ __('Admin Panel') }}
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link
+                        :href="route('teacher.dashboard')"
+                        :active="request()->routeIs('teacher.*')"
+                    >
+                        {{ __('Kelola Materi') }}
                     </x-responsive-nav-link>
                 @endif
             @endauth
@@ -352,4 +370,3 @@
         @endguest
     </div>
 </nav>
-                                            
