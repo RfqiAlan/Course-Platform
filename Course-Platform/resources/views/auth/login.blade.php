@@ -47,7 +47,7 @@
                     <div class="text-center mb-6">
                         {{-- kalau mau pakai logo, aktifkan img di bawah --}}
                         {{-- <img src="/logo/logo.jpeg" class="mx-auto h-14 mb-3 rounded-lg shadow-sm" alt="Logo"> --}}
-                        <h2 class="text-2xl font-bold text-gray-800">Selamat Datang <img src="public/logo/logo.jpeg"></h2>
+                       <img src="{{ asset('logo/logo.jpeg') }}" alt="Logo" style="height: auto; width: auto; border-radius: 12px;">
                         <p class="text-gray-500 text-sm">
                             Silakan login untuk melanjutkan ke dashboard kamu.
                         </p>

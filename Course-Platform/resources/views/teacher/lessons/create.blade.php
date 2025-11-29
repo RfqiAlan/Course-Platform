@@ -1,13 +1,22 @@
 <x-app-layout :title="'Tambah Lesson – '.$module->title">
     <div class="container py-4">
-        <div class="mb-3">
-            <h1 class="h5 mb-1">Tambah Lesson</h1>
-            <p class="small text-muted mb-0">
-                Modul: <strong>{{ $module->title }}</strong><br>
-                Course: <strong>{{ $course->title }}</strong>
-            </p>
-        </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h5 mb-1">Tambah Lesson</h1>
+                <p class="small text-muted mb-0">
+                    Modul: <strong>{{ $module->title }}</strong><br>
+                    Course: <strong>{{ $course->title }}</strong>
+                </p>
+            </div>
 
+            <a href="{{ route('teacher.courses.modules.lessons.index', [
+                        'course' => $course->id,
+                        'module' => $module->id,
+                    ]) }}"
+               class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Kembali
+            </a>
+        </div>
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body">
                 <form action="{{ route('teacher.courses.modules.lessons.store', [

@@ -1,11 +1,20 @@
 <x-app-layout :title="'Edit Course – '.$course->title">
-    <div class="container py-4">
-        <div class="mb-3">
+   <div class="container py-4">
+
+    {{-- HEADER --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
             <h1 class="h5 mb-1">Edit Course</h1>
             <p class="small text-muted mb-0">
                 Perbarui informasi course dan penugasan teacher.
             </p>
         </div>
+
+        <a href="{{ route('admin.courses.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Kembali
+        </a>
+    </div>
+
 
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body">

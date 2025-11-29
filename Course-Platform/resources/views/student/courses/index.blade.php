@@ -32,30 +32,29 @@
             backdrop-filter: blur(8px);
         }
 
-        .table-courses thead {
-            border-radius: 12px;
-            overflow: hidden;
+        /* BOX / CARD KURSUS SAYA */
+        .course-card {
+            border-radius: 1.1rem;
+            border: 1px solid #e5e7eb;
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
         }
-        .table-courses thead th {
-            border-bottom-width: 0;
-            background: #f3f4ff;
-            color: #4b5563;
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(15, 23, 42, .12);
+            border-color: rgba(37, 99, 235, 0.28);
         }
-        .table-courses tbody tr {
-            transition: background-color .18s ease, transform .12s ease, box-shadow .12s ease;
-        }
-        .table-courses tbody tr:hover {
-            background-color: #f9fafb;
-            transform: translateY(-1px);
-            box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
-        }
-
         .course-title {
             max-width: 260px;
         }
         .course-meta {
-            font-size: .72rem;
+            font-size: .75rem;
             color: #9ca3af;
+        }
+        .course-desc {
+            font-size: .8rem;
+        }
+        .course-footer-text {
+            font-size: .8rem;
         }
 
         .progress-track {
@@ -66,7 +65,7 @@
         }
         .progress-bar-brand {
             background: #0F3D73;
-             height: 100%;        /* ⬅️ ini penting */
+            height: 100%;
             transition: width .25s ease;
         }
 
@@ -81,7 +80,6 @@
         .badge-status i {
             font-size: .85em;
         }
-
         .badge-status-done {
             background: #dcfce7;
             color: #166534;
@@ -132,7 +130,7 @@
             </div>
         </div>
 
-        {{-- CARD TABEL KURSUS --}}
+        {{-- CARD: GRID BOX KURSUS --}}
         <div class="card border-0 shadow-sm rounded-4" data-aos="fade-up" data-aos-duration="550" data-aos-delay="80">
             <div class="card-body">
 
@@ -143,122 +141,133 @@
                     </div>
                 @endif
 
-                <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="h6 mb-0">Daftar Kursus</h2>
                     <span class="small text-muted">
                         Total: <strong>{{ $courses->count() }}</strong> kursus
                     </span>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0 table-courses">
-                        <thead class="small">
-                        <tr>
-                            <th>Course</th>
-                            <th>Kategori</th>
-                            <th>Pengajar</th>
-                            <th style="width:230px;">Progress</th>
-                            <th>Status</th>
-                            <th class="text-end">Aksi</th>
-                        </tr>
-                        </thead>
-                        <tbody class="small">
-                        @forelse($courses as $item)
-                            @php
-                                $course   = $item->course ?? $item; // tergantung relasi
-                                $progress = $item->progress_percent ?? ($item->pivot->progress ?? 0);
-                                $isDone   = $item->is_completed ?? ($item->pivot->is_completed ?? false);
-                            @endphp
-                            <tr>
-                                <td>
-                                    <div class="fw-semibold text-truncate course-title">
-                                        {{ $course->title }}
+                {{-- GRID BOX --}}
+                <div class="row g-3">
+                    @forelse($courses as $item)
+                        @php
+                            $course   = $item->course ?? $item; // tergantung relasi
+                            $progress = $item->progress_percent ?? ($item->pivot->progress ?? 0);
+                            $isDone   = $item->is_completed ?? ($item->pivot->is_completed ?? false);
+                        @endphp
+
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card course-card h-100" data-aos="fade-up" data-aos-duration="550">
+                                <div class="card-body d-flex flex-column">
+
+                                    {{-- HEADER KECIL DALAM BOX --}}
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-light text-muted border">
+                                            {{ $course->category->name ?? 'Umum' }}
+                                        </span>
+
+                                        @if($isDone)
+                                            <span class="badge-status badge-status-done">
+                                                <i class="bi bi-check-circle-fill"></i>
+                                                Selesai
+                                            </span>
+                                        @elseif($progress > 0)
+                                            <span class="badge-status badge-status-learning">
+                                                <i class="bi bi-play-circle-fill"></i>
+                                                Sedang dipelajari
+                                            </span>
+                                        @else
+                                            <span class="badge-status badge-status-not">
+                                                <i class="bi bi-dot"></i>
+                                                Belum mulai
+                                            </span>
+                                        @endif
                                     </div>
-                                    <div class="course-meta mt-1">
+
+                                    {{-- JUDUL & PENGAJAR --}}
+                                    <h3 class="course-title mb-1 text-truncate" title="{{ $course->title }}">
+                                        {{ $course->title }}
+                                    </h3>
+                                    <p class="small text-muted mb-2">
+                                        <i class="bi bi-person-workspace me-1"></i>
+                                        {{ $course->teacher->name ?? '-' }}
+                                    </p>
+
+                                    {{-- META RINGKAS --}}
+                                    <p class="course-meta mb-3">
                                         <i class="bi bi-layers me-1"></i>
                                         {{ $course->modules->count() ?? 0 }} modul
                                         <span class="mx-1">•</span>
                                         <i class="bi bi-people me-1"></i>
                                         {{ $course->students->count() ?? 0 }} siswa
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-light text-muted border">
-                                        {{ $course->category->name ?? 'Umum' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="d-inline-flex align-items-center gap-1">
-                                        <i class="bi bi-person-workspace text-muted"></i>
-                                        <span>{{ $course->teacher->name ?? '-' }}</span>
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-column gap-1">
-                                        <div class="d-flex justify-content-between">
-                                            <span class="text-muted">Progres</span>
-                                            <span class="fw-semibold">{{ $progress }}%</span>
+                                    </p>
+
+                                    {{-- PROGRESS --}}
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="text-muted small">Progres</span>
+                                            <span class="fw-semibold small">{{ $progress }}%</span>
                                         </div>
                                         <div class="progress-track">
-                                            <div class="progress-bar progress-bar-brand" style="width: {{ $progress }}%"></div>
+                                            <div class="progress-bar-brand" style="width: {{ $progress }}%"></div>
                                         </div>
                                     </div>
-                                </td>
-                                <td>
-                                    @if($isDone)
-                                        <span class="badge-status badge-status-done">
-                                            <i class="bi bi-check-circle-fill"></i>
-                                            Selesai
+
+                                    {{-- FOOTER BOX --}}
+                                    <div class="mt-auto d-flex justify-content-between align-items-center course-footer-text">
+                                        <span class="text-muted">
+                                            @if($isDone)
+                                                <i class="bi bi-award me-1 text-success"></i>
+                                                Siap unduh sertifikat
+                                            @elseif($progress > 0)
+                                                <i class="bi bi-clock-history me-1"></i>
+                                                Lanjutkan belajar
+                                            @else
+                                                <i class="bi bi-play-circle me-1"></i>
+                                                Mulai sekarang
+                                            @endif
                                         </span>
-                                    @elseif($progress > 0)
-                                        <span class="badge-status badge-status-learning">
-                                            <i class="bi bi-play-circle-fill"></i>
-                                            Sedang dipelajari
-                                        </span>
-                                    @else
-                                        <span class="badge-status badge-status-not">
-                                            <i class="bi bi-dot"></i>
-                                            Belum mulai
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('student.courses.learn',$course) }}"
-                                           class="btn btn-primary">
-                                            <i class="bi bi-play-circle me-1"></i> Belajar
-                                        </a>
-                                        @if($isDone)
-                                            <a href="{{ route('student.certificates.index') }}"
-                                               class="btn btn-outline-success">
-                                                <i class="bi bi-award me-1"></i> Sertifikat
+
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ route('student.courses.learn',$course) }}"
+                                               class="btn btn-primary">
+                                                <i class="bi bi-play-circle me-1"></i> Belajar
                                             </a>
-                                        @endif
+                                            @if($isDone)
+                                                <a href="{{ route('student.certificates.index') }}"
+                                                   class="btn btn-outline-success">
+                                                    <i class="bi bi-award me-1"></i>
+                                                </a>
+                                            @endif
+                                        </div>
                                     </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
-                                    <div class="mb-2">
-                                        <i class="bi bi-emoji-neutral fs-3 d-block mb-1"></i>
-                                        Belum ada course yang kamu ikuti.
-                                    </div>
-                                    <a href="{{ route('courses.index') }}" class="btn btn-sm btn-primary">
-                                        Mulai cari course di sini
-                                    </a>
-                                </td>
-                            </tr>
-                        @endforelse
-                        </tbody>
-                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-12">
+                            <div class="alert alert-light border text-center py-4">
+                                <div class="mb-2">
+                                    <i class="bi bi-emoji-neutral fs-3 d-block mb-1"></i>
+                                    Belum ada course yang kamu ikuti.
+                                </div>
+                                <a href="{{ route('courses.index') }}" class="btn btn-sm btn-primary">
+                                    Mulai cari course di sini
+                                </a>
+                            </div>
+                        </div>
+                    @endforelse
                 </div>
 
+                {{-- PAGINATION (JIKA PAGINATOR) --}}
                 @if($courses instanceof \Illuminate\Pagination\AbstractPaginator)
                     <div class="mt-3">
                         {{ $courses->links() }}
                     </div>
                 @endif
+
             </div>
         </div>
     </div>
