@@ -144,8 +144,7 @@
         {{-- LOGO --}}
         <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
             {{-- Pastikan path logo benar --}}
-            <img src="{{ asset('logo/logo.jpeg') }}" alt="EDVO" style="height: 40px; width: auto; border-radius: 10px;">
-            <span class="d-none d-sm-block fw-bold text-primary" style="letter-spacing: -0.5px;">EDVO</span>
+            <img src="{{ asset('logo/logo.jpeg') }}" alt="EDVO" style="height: 45px; width: auto; border-radius: 10px;">
         </a>
 
         <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">

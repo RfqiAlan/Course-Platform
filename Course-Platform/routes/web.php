@@ -27,11 +27,8 @@ use App\Http\Controllers\Student\PrivateChatController as StudentPrivateChatCont
 use App\Http\Controllers\Student\ContentController as StudentContentController;
 use App\Http\Controllers\Student\LessonController as StudentLessonController;
 
-use App\Http\Controllers\LessonController;
 
 
-
-// Beranda (Livewire page)
 Route::get('/', function () {
     // Jika belum login → tampilkan homepage
     if (!Auth::check()) {

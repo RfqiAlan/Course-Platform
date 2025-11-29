@@ -9,30 +9,35 @@ use Illuminate\Http\Request;
 
 class DiscussionController extends Controller
 {
-    // (Opsional) halaman khusus diskusi course untuk guru
+    // HALAMAN KHUSUS DISKUSI COURSE UNTUK GURU
     public function index(Course $course)
     {
-        $messages = DiscussionMessage::where('course_id', $course->id)
+        // pastikan course milik guru ini (opsional tapi bagus)
+        if ($course->teacher_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $discussions = DiscussionMessage::where('course_id', $course->id)
             ->with('user')
             ->orderBy('created_at')
             ->get();
 
-        return view('teacher.courses.discussion', compact('course', 'messages'));
+        return view('teacher.courses.discussion', [
+            'course'      => $course,
+            'discussions' => $discussions,
+        ]);
     }
 
-    // guru mengirim pesan diskusi
+    // GURU MENGIRIM PESAN DISKUSI
     public function store(Request $request, Course $course)
     {
         $data = $request->validate([
             'message' => ['required', 'string'],
         ]);
 
-        // opsional: pastikan course ini milik guru yang login
-        /*
         if ($course->teacher_id !== auth()->id()) {
             abort(403);
         }
-        */
 
         DiscussionMessage::create([
             'course_id' => $course->id,
@@ -40,6 +45,7 @@ class DiscussionController extends Controller
             'message'   => $data['message'],
         ]);
 
+        // balik ke halaman sebelumnya (bisa /learn student atau /teacher/courses/{course}/discussion)
         return back();
     }
 }

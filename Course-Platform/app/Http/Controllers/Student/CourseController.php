@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Category;
 use App\Models\LessonUserProgress;
+use App\Models\DiscussionMessage; // ⬅️ TAMBAHAN: untuk ambil data diskusi
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
@@ -211,6 +212,12 @@ class CourseController extends Controller
             },
         ]);
 
+        // ⬇️ AMBIL SEMUA DISKUSI UNTUK COURSE INI
+        $discussions = DiscussionMessage::where('course_id', $course->id)
+            ->with('user')
+            ->orderBy('created_at')
+            ->get();
+
         // Kumpulkan semua lesson dalam satu list linear
         $allLessons = $course->modules
             ->flatMap(fn ($m) => $m->lessons)
@@ -223,6 +230,7 @@ class CourseController extends Controller
                 'currentLesson'    => null,
                 'doneLessonIds'    => [],
                 'allowedLessonIds' => [],
+                'discussions'      => $discussions, // ⬅️ penting
             ]);
         }
 
@@ -286,6 +294,7 @@ class CourseController extends Controller
             'currentLesson'    => $currentLesson,
             'doneLessonIds'    => $doneLessonIds,
             'allowedLessonIds' => $allowedLessonIds,
+            'discussions'      => $discussions, // ⬅️ dikirim ke view
         ]);
     }
 }

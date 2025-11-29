@@ -48,12 +48,14 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm rounded-4 mb-3">
                     <div class="card-body">
-                        <div class="ratio ratio-16x9 rounded-3 mb-3"
-                            style="background:linear-gradient(135deg,#93c5fd,#1d4ed8);">
-                            <div class="d-flex justify-content-center align-items-center text-white">
-                                <i class="bi bi-play-circle-fill fs-1"></i>
-                            </div>
+                        <div class="ratio ratio-16x9 rounded-4 mb-3 overflow-hidden"
+                            style="box-shadow:0 12px 28px rgba(0,0,0,0.16);">
+
+                            <video autoplay muted loop playsinline class="w-100 h-100 object-fit-cover">
+                                <source src="/videos/header.mp4" type="video/mp4">
+                            </video>
                         </div>
+
 
                         <p class="small mb-1 text-muted">
                             <i class="bi bi-people me-1 text-primary"></i>

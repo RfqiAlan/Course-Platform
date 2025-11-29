@@ -69,7 +69,12 @@
                         </p>
                     </div>
                 </div>
-                @include('components.course-discussion-box', ['course' => $course])
+
+                {{-- BOX DISKUSI KELAS --}}
+                @include('components.course-discussion-box', [
+                    'course' => $course,
+                    'discussions' => $discussions ?? [], 
+                ])
             </div>
         </div>
     </div>

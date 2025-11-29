@@ -270,7 +270,11 @@
                 {{-- LIVE CHAT --}}
                 <div class="row g-3 mt-3">
                     <div class="col-lg-6">
-                        @include('components.course-discussion-box', ['course' => $course])
+                        {{-- ⬇️ kirim juga $discussions ke komponen --}}
+                        @include('components.course-discussion-box', [
+                            'course' => $course,
+                            'discussions' => $discussions ?? [],
+                        ])
                     </div>
                     <div class="col-lg-6">
                         @include('components.private-chat-box', ['course' => $course])

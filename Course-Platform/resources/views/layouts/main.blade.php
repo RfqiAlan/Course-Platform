@@ -49,12 +49,6 @@
                     <i class="bi bi-mortarboard-fill text-xl" style="color:#0F3D73"></i>
                 </span>
                 <div class="flex flex-col">
-                    <span class="text-sm font-semibold tracking-wide text-slate-900">
-                        EDVO
-                    </span>
-                    <span class="hidden text-[10px] font-medium text-[#0F3D73]/80 sm:inline-flex px-2 py-0.5 rounded-full bg-[#0F3D73]/5">
-                        Final Web 2025
-                    </span>
                 </div>
             </a>
 

@@ -5,154 +5,133 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Course;
+use App\Models\Module;
+use App\Models\DiscussionMessage; // ⬅️ penting: untuk ambil diskusi
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
-    /**
-     * List course di area teacher.
-     * - Teacher: hanya course yang dia ajar
-     * - Admin  : semua course
-     */
-    public function index()
+    // LIST COURSE MILIK TEACHER
+    public function index(Request $request)
     {
-        $user = auth()->user();
+        $user = $request->user();
 
-        if ($user->role === 'admin') {
-            // Admin bisa lihat semua course
-            $courses = Course::with(['category', 'teacher'])
-                ->latest()
-                ->paginate(10);
-        } else {
-            // Teacher hanya course yang dia ajar
-            $courses = $user->taughtCourses()
-                ->with('category')
-                ->latest()
-                ->paginate(10);
-        }
+        $courses = Course::with(['category', 'modules.lessons'])
+            ->where('teacher_id', $user->id)
+            ->latest()
+            ->paginate(10);
 
         return view('teacher.courses.index', compact('courses'));
     }
 
+    // FORM BUAT COURSE
     public function create()
     {
-        $categories = Category::all();
+        $categories = Category::orderBy('name')->get();
 
         return view('teacher.courses.create', compact('categories'));
     }
 
+    // SIMPAN COURSE BARU
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title'        => 'required|string|max:255',
-            'category_id'  => 'required|exists:categories,id',
-            'description'  => 'nullable|string',
-            'start_date'   => 'nullable|date',
-            'end_date'     => 'nullable|date|after_or_equal:start_date',
-            'preview_video'=> 'nullable|file|mimetypes:video/mp4,video/x-m4v,video/quicktime|max:51200', // max 50MB
-            'is_active'    => 'nullable|boolean',
+            'title'       => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'description' => 'nullable|string',
+            'start_date'  => 'nullable|date',
+            'end_date'    => 'nullable|date|after_or_equal:start_date',
+            'is_active'   => 'nullable|boolean',
         ]);
 
-        $user = auth()->user();
-
-        $data['teacher_id'] = $user->id; // kalau admin create dari sini, teacher_id = admin
-        $data['slug']       = Str::slug($data['title']) . '-' . Str::random(4);
-        $data['is_active']  = $request->has('is_active');
-
-        if ($request->hasFile('preview_video')) {
-            $data['preview_video'] = $request->file('preview_video')
-                ->store('course_previews', 'public');
-        }
+        $data['teacher_id'] = $request->user()->id;
+        $data['slug'] = \Str::slug($data['title']) . '-' . uniqid();
+        $data['is_active'] = $request->boolean('is_active', true);
 
         Course::create($data);
 
-        return redirect()
-            ->route('teacher.courses.index')
+        return redirect()->route('teacher.courses.index')
             ->with('success', 'Course berhasil dibuat.');
     }
 
-    public function edit(Course $course)
+    // DETAIL COURSE (UNTUK TEACHER)
+    public function show(Course $course)
     {
-        $this->authorizeOwnership($course);
+        // Pastikan course ini milik teacher yang login
+        if ($course->teacher_id !== auth()->id()) {
+            abort(403);
+        }
 
-        $categories = Category::all();
-
-        return view('teacher.courses.edit', compact('course', 'categories'));
-    }
-
-    public function update(Request $request, Course $course)
-    {
-        $this->authorizeOwnership($course);
-
-        $data = $request->validate([
-            'title'        => 'required|string|max:255',
-            'category_id'  => 'required|exists:categories,id',
-            'description'  => 'nullable|string',
-            'start_date'   => 'nullable|date',
-            'end_date'     => 'nullable|date|after_or_equal:start_date',
-            'preview_video'=> 'nullable|file|mimetypes:video/mp4,video/x-m4v,video/quicktime|max:51200',
-            'is_active'    => 'nullable|boolean',
+        // Load relasi untuk tampilan
+        $course->load([
+            'category',
+            'modules.lessons' => function ($q) {
+                $q->orderBy('order');
+            },
+            'students',
         ]);
 
-        if ($data['title'] !== $course->title) {
-            $data['slug'] = Str::slug($data['title']) . '-' . Str::random(4);
+        // ⬇️ AMBIL SEMUA DISKUSI UNTUK COURSE INI
+        $discussions = DiscussionMessage::where('course_id', $course->id)
+            ->with('user')
+            ->orderBy('created_at')
+            ->get();
+
+        return view('teacher.courses.show', [
+            'course'      => $course,
+            'discussions' => $discussions, // ⬅️ kirim ke view
+        ]);
+    }
+
+    // FORM EDIT COURSE
+    public function edit(Course $course)
+    {
+        if ($course->teacher_id !== auth()->id()) {
+            abort(403);
         }
 
-        $data['is_active'] = $request->has('is_active');
+        $categories = Category::orderBy('name')->get();
 
-        if ($request->hasFile('preview_video')) {
-            $data['preview_video'] = $request->file('preview_video')
-                ->store('course_previews', 'public');
+        return view('teacher.courses.edit', [
+            'course'     => $course,
+            'categories' => $categories,
+        ]);
+    }
+
+    // UPDATE COURSE
+    public function update(Request $request, Course $course)
+    {
+        if ($course->teacher_id !== auth()->id()) {
+            abort(403);
         }
+
+        $data = $request->validate([
+            'title'       => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'description' => 'nullable|string',
+            'start_date'  => 'nullable|date',
+            'end_date'    => 'nullable|date|after_or_equal:start_date',
+            'is_active'   => 'nullable|boolean',
+        ]);
+
+        $data['is_active'] = $request->boolean('is_active', true);
 
         $course->update($data);
 
-        return redirect()
-            ->route('teacher.courses.index')
-            ->with('success', 'Course berhasil diupdate.');
+        return redirect()->route('teacher.courses.index')
+            ->with('success', 'Course berhasil diperbarui.');
     }
 
+    // HAPUS COURSE
     public function destroy(Course $course)
     {
-        $this->authorizeOwnership($course);
+        if ($course->teacher_id !== auth()->id()) {
+            abort(403);
+        }
 
         $course->delete();
 
-        return redirect()
-            ->route('teacher.courses.index')
+        return redirect()->route('teacher.courses.index')
             ->with('success', 'Course berhasil dihapus.');
-    }
-
-    public function show(Course $course)
-    {
-        $this->authorizeOwnership($course);
-
-        // load relasi yang dibutuhkan di view
-        $course->load(['category', 'modules.lessons']);
-
-        return view('teacher.courses.show', compact('course'));
-    }
-
-    /**
-     * Cek hak akses:
-     * - Admin  : boleh semua course
-     * - Teacher: hanya course yang dia ajar (teacher_id = user_id)
-     */
-    protected function authorizeOwnership(Course $course): void
-    {
-        $user = auth()->user();
-
-        // Admin boleh semuanya
-        if ($user->role === 'admin') {
-            return;
-        }
-
-        // Teacher hanya boleh course miliknya
-        if ($user->role === 'teacher' && $course->teacher_id === $user->id) {
-            return;
-        }
-
-        abort(403);
     }
 }
