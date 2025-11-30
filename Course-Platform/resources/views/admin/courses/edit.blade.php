@@ -1,7 +1,6 @@
 <x-app-layout :title="'Edit Course – '.$course->title">
    <div class="container py-4">
 
-    {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h5 mb-1">Edit Course</h1>

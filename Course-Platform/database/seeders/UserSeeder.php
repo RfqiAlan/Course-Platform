@@ -10,9 +10,7 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // ======================
-        // ADMIN DEFAULT
-        // ======================
+        
         User::updateOrCreate(
             ['email' => 'rifqialanm@gmail.com'],
             [
@@ -22,9 +20,7 @@ class UserSeeder extends Seeder
             ]
         );
 
-        // ======================
-        // TEACHER DEFAULT
-        // ======================
+      
         User::updateOrCreate(
             ['email' => 'teacher@example.com'],
             [
@@ -34,9 +30,7 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-        // ======================
-        // STUDENT DEFAULT
-        // ======================
+    
         User::updateOrCreate(
             ['email' => 'student@example.com'],
             [

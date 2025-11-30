@@ -2,7 +2,6 @@
     <div class="py-4">
         <div class="container">
 
-            {{-- HEADER --}}
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="h4 mb-1">Edit Kategori Kursus</h1>
@@ -16,7 +15,6 @@
                 </a>
             </div>
 
-            {{-- CARD FORM --}}
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-xl-7">
                     <div class="card border-0 shadow-sm rounded-4">
@@ -35,7 +33,6 @@
                                 @csrf
                                 @method('PUT')
 
-                                {{-- NAMA KATEGORI --}}
                                 <div class="mb-3">
                                     <label for="name" class="form-label">
                                         Nama Kategori <span class="text-danger">*</span>
@@ -60,7 +57,6 @@
                                     @enderror
                                 </div>
 
-                                {{-- DESKRIPSI --}}
                                 <div class="mb-4">
                                     <label for="description" class="form-label">
                                         Deskripsi (opsional)
@@ -76,7 +72,6 @@
                                     </div>
                                 </div>
 
-                                {{-- ACTION BUTTONS --}}
                                 <div class="d-flex justify-content-end gap-2">
                                     <a href="{{ route('admin.categories.index') }}"
                                        class="btn btn-light border rounded-3">
@@ -92,7 +87,6 @@
                         </div>
                     </div>
 
-                    {{-- INFO KECIL --}}
                     <p class="text-muted small text-center mt-3 mb-0">
                         Perubahan nama kategori tidak akan menghapus kursus yang sudah terhubung.
                     </p>

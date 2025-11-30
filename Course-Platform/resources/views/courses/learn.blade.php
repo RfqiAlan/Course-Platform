@@ -1,7 +1,6 @@
 <x-app-layout :title="'Belajar: '.$course->title">
     <div class="container py-4">
         <div class="row g-3">
-            {{-- SIDEBAR --}}
             <div class="col-lg-3">
                 <div class="card border-0 shadow-sm rounded-4" style="position:sticky;top:5rem;">
                     <div class="card-body">
@@ -32,8 +31,6 @@
                     </div>
                 </div>
             </div>
-
-            {{-- KONTEN --}}
             <div class="col-lg-9">
                 <div class="card border-0 shadow-sm rounded-4">
                     <div class="card-body">

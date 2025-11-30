@@ -101,12 +101,8 @@
                 </div>
             </div>
 
-            {{-- ===================================== --}}
-            {{-- RIGHT: ROLE BADGE + CTA + PROFILE (DESKTOP) --}}
-            {{-- ===================================== --}}
             <div class="hidden sm:flex items-center gap-4">
 
-                {{-- ROLE BADGE --}}
                 @auth
                     @if($user)
                         <span class="inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50/80 px-3 py-1 text-[11px] font-medium text-indigo-700">
@@ -116,7 +112,6 @@
                     @endif
                 @endauth
 
-                {{-- CTA GUEST --}}
                 @guest
                     <a href="{{ route('login') }}"
                        class="inline-flex items-center rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition">
@@ -128,9 +123,9 @@
                     </a>
                 @endguest
 
-                {{-- CTA PER ROLE --}}
+     
                 @auth
-                    {{-- STUDENT --}}
+        
                     @if($user->role === 'student' || (method_exists($user,'isStudent') && $user->isStudent()))
                         <a href="{{ route('student.courses.index') }}"
                            class="hidden md:inline-flex items-center rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-black transition">
@@ -138,7 +133,7 @@
                         </a>
                     @endif
 
-                    {{-- TEACHER --}}
+           
                     @if($user->role === 'teacher')
                         <a href="{{ route('teacher.dashboard') }}"
                            class="hidden md:inline-flex items-center rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 transition">
@@ -146,14 +141,12 @@
                         </a>
                     @endif
 
-                    {{-- ADMIN --}}
                     @if($user->role === 'admin')
                         <a href="{{ route('admin.dashboard') }}"
                            class="hidden md:inline-flex items-center rounded-full bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-rose-700 transition">
                             Admin Panel
                         </a>
 
-                        {{-- Admin boleh masuk ke area teacher untuk kelola materi --}}
                         <a href="{{ route('teacher.dashboard') }}"
                            class="hidden md:inline-flex items-center rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 transition">
                             Kelola Materi
@@ -161,7 +154,6 @@
                     @endif
                 @endauth
 
-                {{-- PROFILE DROPDOWN --}}
                 @auth
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
@@ -202,7 +194,6 @@
                                 {{ __('Profile') }}
                             </x-dropdown-link>
 
-                            <!-- Logout -->
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <x-dropdown-link :href="route('logout')"
@@ -215,9 +206,6 @@
                 @endauth
             </div>
 
-            {{-- ===================================== --}}
-            {{-- HAMBURGER (MOBILE) --}}
-            {{-- ===================================== --}}
             <div class="flex items-center sm:hidden">
                 <button @click="open = ! open"
                         class="inline-flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:bg-slate-100 focus:text-slate-700 focus:outline-none transition">
@@ -236,13 +224,9 @@
         </div>
     </div>
 
-    {{-- ===================================== --}}
-    {{-- RESPONSIVE MENU (MOBILE) --}}
-    {{-- ===================================== --}}
     <div :class="{ 'block': open, 'hidden': ! open }"
          class="hidden border-t border-slate-100 bg-white sm:hidden">
 
-        {{-- USER INFO MOBILE --}}
         @auth
             <div class="px-4 pt-3 pb-2">
                 <div class="mb-3 flex items-center gap-3">
@@ -261,10 +245,8 @@
             </div>
         @endauth
 
-        {{-- LINKS MOBILE --}}
         <div class="space-y-1 border-t border-slate-100 px-2 pb-3 pt-1">
 
-            {{-- Beranda --}}
             @auth
                 <x-responsive-nav-link
                     :href="route('dashboard')"
@@ -289,7 +271,6 @@
                 </x-responsive-nav-link>
             @endguest
 
-            {{-- Kursus (Guest) --}}
             @guest
                 <x-responsive-nav-link
                     :href="route('courses.index')"
@@ -300,7 +281,6 @@
             @endguest
 
             @auth
-                {{-- STUDENT: Kursus Saya --}}
                 @if($user->role === 'student' || (method_exists($user,'isStudent') && $user->isStudent()))
                     <x-responsive-nav-link
                         :href="route('student.courses.index')"
@@ -310,7 +290,6 @@
                     </x-responsive-nav-link>
                 @endif
 
-                {{-- TEACHER: Panel Pengajar --}}
                 @if($user->role === 'teacher')
                     <x-responsive-nav-link
                         :href="route('teacher.dashboard')"
@@ -320,7 +299,6 @@
                     </x-responsive-nav-link>
                 @endif
 
-                {{-- ADMIN: Admin Panel + Kelola Materi --}}
                 @if($user->role === 'admin')
                     <x-responsive-nav-link
                         :href="route('admin.dashboard')"
@@ -339,7 +317,6 @@
             @endauth
         </div>
 
-        {{-- SETTINGS MOBILE --}}
         @auth
             <div class="border-t border-slate-100 px-2 pb-3 pt-2">
                 <x-responsive-nav-link :href="route('profile.edit')">

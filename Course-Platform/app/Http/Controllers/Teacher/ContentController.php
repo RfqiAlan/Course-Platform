@@ -12,11 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ContentController extends Controller
 {
-    /**
-     * List konten untuk 1 lesson (nested).
-     * Route: teacher.courses.modules.lessons.contents.index
-     * URL  : /teacher/courses/{course}/modules/{module}/lessons/{lesson}/contents
-     */
+
     public function index(Course $course, Module $module, Lesson $lesson)
     {
         $this->authorizeCourse($course);
@@ -28,10 +24,7 @@ class ContentController extends Controller
         return view('teacher.contents.index', compact('course', 'module', 'lesson', 'contents'));
     }
 
-    /**
-     * Form tambah konten (nested).
-     * Route: teacher.courses.modules.lessons.contents.create
-     */
+
     public function create(Course $course, Module $module, Lesson $lesson)
     {
         $this->authorizeCourse($course);
@@ -48,17 +41,14 @@ class ContentController extends Controller
         ]);
     }
 
-    /**
-     * Simpan konten (nested).
-     * Route: teacher.courses.modules.lessons.contents.store
-     */
+
     public function store(Request $request, Course $course, Module $module, Lesson $lesson)
     {
         $this->authorizeCourse($course);
         abort_unless($module->course_id === $course->id, 404);
         abort_unless($lesson->module_id === $module->id, 404);
 
-        // validasi dasar
+
         $data = $request->validate([
             'type'  => 'required|in:text,file,video', // enum di DB masih text|file|video
             'title' => 'nullable|string|max:255',
@@ -68,41 +58,35 @@ class ContentController extends Controller
             'order' => 'nullable|integer',
         ]);
 
-        // jika type text → body wajib
         if ($request->type === 'text') {
             $request->validate([
                 'body' => 'required|string',
             ]);
         }
 
-        // jika type file → bisa dokumen DAN gambar (jpg/png/webp)
         if ($request->type === 'file') {
             $request->validate([
                 'file' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,zip,rar,jpg,jpeg,png,webp|max:51200',
             ]);
         }
 
-        // jika type video → video wajib
         if ($request->type === 'video') {
             $request->validate([
                 'video' => 'required|file|mimetypes:video/mp4,video/quicktime|max:204800',
             ]);
         }
 
-        // order otomatis kalau kosong
         if (!isset($data['order']) || $data['order'] === '' || $data['order'] === null) {
             $maxOrder      = $lesson->contents()->max('order');
             $data['order'] = ($maxOrder ?? 0) + 1;
         }
 
-        // file materi (dokumen / gambar)
         if ($request->hasFile('file')) {
             $data['file_path'] = $request->file('file')->store('course/files', 'public');
         } else {
             $data['file_path'] = null;
         }
 
-        // video
         if ($request->hasFile('video')) {
             $data['video_path'] = $request->file('video')->store('course/videos', 'public');
         } else {
@@ -124,11 +108,7 @@ class ContentController extends Controller
             ->with('success', 'Materi berhasil dibuat.');
     }
 
-    /**
-     * Form edit konten (shallow).
-     * Route: teacher.contents.edit
-     * URL  : /teacher/contents/{content}/edit
-     */
+
     public function edit(Content $content)
     {
         $lesson = $content->lesson;
@@ -140,11 +120,7 @@ class ContentController extends Controller
         return view('teacher.contents.edit', compact('course', 'module', 'lesson', 'content'));
     }
 
-    /**
-     * Update konten (shallow).
-     * Route: teacher.contents.update
-     * URL  : /teacher/contents/{content}
-     */
+
     public function update(Request $request, Content $content)
     {
         $lesson = $content->lesson;
@@ -180,7 +156,6 @@ class ContentController extends Controller
             ]);
         }
 
-        // handle file (dokumen / gambar)
         if ($request->hasFile('file')) {
             if ($content->file_path) {
                 Storage::disk('public')->delete($content->file_path);
@@ -188,7 +163,6 @@ class ContentController extends Controller
             $data['file_path'] = $request->file('file')->store('course/files', 'public');
         }
 
-        // handle video
         if ($request->hasFile('video')) {
             if ($content->video_path) {
                 Storage::disk('public')->delete($content->video_path);
@@ -196,7 +170,6 @@ class ContentController extends Controller
             $data['video_path'] = $request->file('video')->store('course/videos', 'public');
         }
 
-        // order otomatis kalau kosong
         if (!isset($data['order']) || $data['order'] === '' || $data['order'] === null) {
             $maxOrder      = $lesson->contents()
                 ->where('id', '!=', $content->id)
@@ -217,11 +190,7 @@ class ContentController extends Controller
             ->with('success', 'Materi berhasil diupdate.');
     }
 
-    /**
-     * Hapus konten (shallow).
-     * Route: teacher.contents.destroy
-     * URL  : /teacher/contents/{content}
-     */
+   
     public function destroy(Content $content)
     {
         $lesson = $content->lesson;
@@ -248,11 +217,7 @@ class ContentController extends Controller
             ->with('success', 'Materi berhasil dihapus.');
     }
 
-    /**
-     * Akses course:
-     * - Admin  : boleh semua
-     * - Teacher: hanya course yang dia ajar
-     */
+ 
     protected function authorizeCourse(Course $course): void
     {
         $user = auth()->user();

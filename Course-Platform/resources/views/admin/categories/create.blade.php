@@ -21,20 +21,14 @@
                 <div class="col-lg-8 col-xl-7">
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-4 p-md-5">
-
-                            {{-- TITLE DI ATAS FORM --}}
                             <div class="mb-4">
                                 <h2 class="h5 mb-1">Form Kategori Baru</h2>
                                 <p class="text-muted small mb-0">
                                     Lengkapi informasi di bawah ini untuk menambahkan kategori kursus.
                                 </p>
                             </div>
-
-                            {{-- FORM --}}
                             <form action="{{ route('admin.categories.store') }}" method="POST" novalidate>
                                 @csrf
-
-                                {{-- INPUT: NAMA KATEGORI --}}
                                 <div class="mb-3">
                                     <label for="name" class="form-label">
                                         Nama Kategori <span class="text-danger">*</span>
@@ -58,8 +52,6 @@
                                         </div>
                                     @enderror
                                 </div>
-
-                                {{-- INPUT: DESKRIPSI --}}
                                 <div class="mb-4">
                                     <label for="description" class="form-label">
                                         Deskripsi (opsional)
@@ -70,13 +62,12 @@
                                         rows="4"
                                         class="form-control rounded-3"
                                         placeholder="Deskripsikan kategori ini secara singkat.">
-{{ old('description') }}</textarea>
+                                        {{ old('description') }}</textarea>
                                     <div class="form-text">
                                         Deskripsi akan membantu pengguna memahami cakupan kategori ini.
                                     </div>
                                 </div>
 
-                                {{-- ACTION BUTTONS --}}
                                 <div class="d-flex justify-content-end gap-2">
                                     <a href="{{ route('admin.categories.index') }}"
                                        class="btn btn-light border rounded-3">
@@ -92,7 +83,6 @@
                         </div>
                     </div>
 
-                    {{-- OPTIONAL: INFO KECIL DI BAWAH --}}
                     <p class="text-muted small text-center mt-3 mb-0">
                         Pastikan nama kategori tidak duplikat dengan kategori lain untuk menghindari kebingungan.
                     </p>

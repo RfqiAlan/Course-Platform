@@ -47,7 +47,6 @@
             padding: .3rem .7rem;
         }
 
-        /* COURSE CARD */
         .course-card {
             border-radius: 18px;
             border: 0;
@@ -80,16 +79,10 @@
 <x-app-layout title="Katalog Kursus – EDVO">
     <div class="container py-4">
 
-        {{-- ====================== --}}
-        {{-- HERO: 1 CARD SAJA --}}
-        {{-- ====================== --}}
-        {{-- ====================== --}}
-        {{-- HERO: 1 CARD SAJA – TENGAH --}}
-        {{-- ====================== --}}
+
         <section class="pb-4">
             <div class="catalog-hero-card p-4 p-lg-5 text-center" data-aos="fade-up" data-aos-duration="600">
 
-                {{-- TAG --}}
                 <div class="d-flex justify-content-center mb-3">
                     <div class="badge rounded-pill px-3 py-2 catalog-hero-tag"
                         style="background:#EAF2FF;color:#0F3D73;">
@@ -97,19 +90,16 @@
                     </div>
                 </div>
 
-                {{-- TITLE --}}
                 <h1 class="fw-bold mb-3 catalog-hero-title">
                     Temukan Kursus Terbaik<br>
                     untuk Perjalanan Belajarmu.
                 </h1>
 
-                {{-- SUBTITLE --}}
                 <p class="text-muted mb-4 catalog-hero-subtitle mx-auto">
                     Jelajahi ratusan kursus dari berbagai kategori. Gunakan filter untuk mencari
                     berdasarkan kategori, pengajar, dan minat belajarmu — dari level dasar hingga lanjutan.
                 </p>
 
-                {{-- CTA --}}
                 <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
                     <a href="#course-list" class="btn btn-primary btn-lg px-4"
                         style="background:#0F3D73;border-color:#0F3D73;">
@@ -124,7 +114,6 @@
                     @endguest
                 </div>
 
-                {{-- CHECKPOINT --}}
                 <div class="d-flex flex-wrap justify-content-center gap-3 text-muted small mb-4">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-check-circle-fill text-success"></i>
@@ -136,7 +125,6 @@
                     </div>
                 </div>
 
-                {{-- STATS --}}
                 <div class="d-flex flex-wrap justify-content-center gap-4">
                     <div>
                         <div class="catalog-stat-number" style="color:#FFC400;">
@@ -158,12 +146,8 @@
         </section>
 
 
-        {{-- ====================== --}}
-        {{-- FILTER + LIST --}}
-        {{-- ====================== --}}
         <section id="course-list" class="pb-4" data-aos="fade-up" data-aos-duration="600">
 
-            {{-- FILTER BAR --}}
             <div
                 class="mb-3 p-3 p-md-3 rounded-4 bg-white shadow-sm d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <h2 class="h6 mb-0">Daftar Kursus</h2>
@@ -171,7 +155,6 @@
                 <form method="GET" action="{{ route('courses.index') }}"
                     class="d-flex flex-wrap gap-2 align-items-center">
 
-                    {{-- SEARCH --}}
                     <div class="input-group input-group-sm" style="max-width:260px">
                         <span class="input-group-text bg-white border-end-0">
                             <i class="bi bi-search text-muted"></i>
@@ -180,7 +163,6 @@
                             placeholder="Cari judul / pengajar">
                     </div>
 
-                    {{-- CATEGORY --}}
                     <select name="category_id" class="form-select form-select-sm" style="max-width:180px">
                         <option value="">Semua kategori</option>
                         @foreach($categories ?? [] as $cat)
@@ -196,14 +178,12 @@
                 </form>
             </div>
 
-            {{-- COURSE GRID --}}
             <div class="row g-3">
                 @forelse($courses as $course)
                     <div class="col-md-6 col-lg-4">
                         <div class="card course-card h-100" data-aos="fade-up" data-aos-duration="550">
                             <div class="card-body d-flex flex-column">
 
-                                {{-- HEADER KECIL DALAM BOX --}}
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <span class="badge bg-light text-muted border">
                                         {{ $course->category->name ?? 'Umum' }}
@@ -222,7 +202,6 @@
                                     @endif
                                 </div>
 
-                                {{-- JUDUL & PENGAJAR --}}
                                 <h3 class="course-title mb-1 text-truncate" title="{{ $course->title }}">
                                     {{ $course->title }}
                                 </h3>
@@ -231,12 +210,10 @@
                                     {{ $course->teacher->name ?? 'Pengajar' }}
                                 </p>
 
-                                {{-- DESKRIPSI SINGKAT --}}
                                 <p class="text-muted course-desc mb-3">
                                     {{ \Illuminate\Support\Str::limit($course->description, 80) }}
                                 </p>
 
-                                {{-- FOOTER BOX --}}
                                 <div class="mt-auto d-flex justify-content-between align-items-center course-footer-text">
                                     <span class="text-muted">
                                         <i class="bi bi-people me-1"></i>

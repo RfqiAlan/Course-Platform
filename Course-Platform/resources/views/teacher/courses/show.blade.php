@@ -1,9 +1,6 @@
-{{-- resources/views/teacher/courses/show.blade.php --}}
-
 <x-app-layout :title="$course->title.' – Panel Pengajar'">
     <div class="container py-4">
         <div class="row g-4">
-            {{-- KIRI: INFO COURSE & KURIKULUM --}}
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm rounded-4 mb-3">
                     <div class="card-body">
@@ -47,10 +44,7 @@
                     </div>
                 </div>
             </div>
-
-            {{-- KANAN: PANEL GURU + CHAT KELAS --}}
             <div class="col-lg-4">
-                {{-- Statistik singkat --}}
                 <div class="card border-0 shadow-sm rounded-4 mb-3">
                     <div class="card-body">
                         <h2 class="h6 mb-3">Panel Pengajar</h2>
@@ -69,8 +63,6 @@
                         </p>
                     </div>
                 </div>
-
-                {{-- BOX DISKUSI KELAS --}}
                 @include('components.course-discussion-box', [
                     'course' => $course,
                     'discussions' => $discussions ?? [], 

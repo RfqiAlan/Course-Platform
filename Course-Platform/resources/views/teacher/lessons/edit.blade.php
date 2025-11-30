@@ -1,7 +1,5 @@
 <x-app-layout :title="'Edit Lesson – '.$lesson->title">
     <div class="container py-4">
-
-        {{-- HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="h5 mb-1">Edit Lesson</h1>
@@ -10,8 +8,6 @@
                     Course: <strong>{{ $lesson->module->course->title }}</strong>
                 </p>
             </div>
-
-            {{-- KEMBALI KE DAFTAR LESSON (ROUTE DIBETULKAN) --}}
             <a href="{{ route('teacher.courses.modules.lessons.index', [
                     'course' => $lesson->module->course_id,
                     'module' => $lesson->module_id,
@@ -35,8 +31,6 @@
                       method="POST" class="row g-4">
                     @csrf 
                     @method('PUT')
-
-                    {{-- JUDUL & URUTAN --}}
                     <div class="col-lg-8">
                         <label class="form-label small">Judul Lesson</label>
                         <input type="text" name="title" 
@@ -65,8 +59,6 @@
                             </div>
                         @enderror
                     </div>
-
-                    {{-- RINGKASAN --}}
                     <div class="col-12">
                         <label class="form-label small">Ringkasan (opsional)</label>
                         <textarea name="summary" rows="4"
@@ -80,8 +72,6 @@
                             </div>
                         @enderror
                     </div>
-
-                    {{-- BUTTONS --}}
                     <div class="col-12 d-flex justify-content-end gap-2 mt-2">
                         <a href="{{ route('teacher.courses.modules.lessons.index', [
                                 'course' => $lesson->module->course_id,

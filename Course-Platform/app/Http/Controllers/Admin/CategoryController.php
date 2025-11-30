@@ -29,8 +29,7 @@ class CategoryController extends Controller
         ]);
 
         $data['slug'] = Str::slug($data['name']);
-
-        // kalau slug sudah ada, tambahkan angka unik
+        
         if (Category::where('slug', $data['slug'])->exists()) {
             $data['slug'] .= '-' . uniqid();
         }

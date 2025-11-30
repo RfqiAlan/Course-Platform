@@ -6,7 +6,6 @@
                 <div class="card border-0 shadow-sm rounded-4">
                     <div class="card-body p-0" style="height: 70vh; display:flex; flex-direction:column;">
 
-                        {{-- Header --}}
                         <div class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
                             <div>
                                 <div class="fw-semibold">
@@ -21,8 +20,6 @@
                                 &larr; Kembali
                             </a>
                         </div>
-
-                        {{-- Pesan --}}
                         <div id="private-chat-box-teacher"
                              class="flex-grow-1 overflow-auto p-3"
                              style="background:#f9fafb;">
@@ -52,8 +49,6 @@
                                 </p>
                             @endforelse
                         </div>
-
-                        {{-- Form --}}
                         <form action="{{ route('teacher.private-chats.store', $thread) }}"
                               method="POST"
                               class="d-flex gap-2 p-3 border-top">

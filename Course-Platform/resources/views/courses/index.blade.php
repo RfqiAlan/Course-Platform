@@ -67,10 +67,8 @@
 <x-app-layout title="Katalog Kursus – EDVO">
     <div class="container py-4">
 
-        {{-- HERO --}}
         <section class="pb-4">
             <div class="row g-4 align-items-center">
-                {{-- LEFT: TEXT --}}
                 <div class="col-lg-7" data-aos="fade-right" data-aos-duration="650">
                     <div class="catalog-hero-card p-4 p-lg-5">
                         <div class="badge rounded-pill px-3 py-2 mb-3 catalog-hero-tag"
@@ -111,7 +109,6 @@
                             @endauth
                         </div>
 
-                        {{-- small stats --}}
                         <div class="d-flex flex-wrap gap-4">
                             <div>
                                 <div class="catalog-stat-number" style="color:#FFC400;">
@@ -137,7 +134,6 @@
                     </div>
                 </div>
 
-                {{-- RIGHT: ILLUSTRATION / MOCKUP --}}
                 <div class="col-lg-5 d-none d-lg-block" data-aos="fade-left" data-aos-duration="650">
                     <div class="position-relative">
                         <div class="rounded-circle"
@@ -175,10 +171,7 @@
                 </div>
             </div>
         </section>
-
-        {{-- FILTER + LIST --}}
         <section id="course-list" class="pb-4" data-aos="fade-up" data-aos-duration="600">
-            {{-- FILTER BAR --}}
             <div class="mb-3 p-3 p-md-3 rounded-4 bg-white shadow-sm d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <h2 class="h6 mb-0">Daftar Kursus</h2>
 
@@ -206,13 +199,12 @@
                 </form>
             </div>
 
-            {{-- COURSE GRID --}}
             <div class="row g-3">
                 @forelse($courses as $course)
                     <div class="col-md-6 col-lg-4">
                         <div class="card course-card h-100" data-aos="fade-up" data-aos-duration="550">
                             <div class="ratio ratio-16x9 course-thumb">
-                                {{-- jika nanti ada thumbnail image, bisa diletakkan di sini sebagai <img> --}}
+                               
                                 <span class="course-thumb-badge">
                                     {{ $course->category->name ?? 'Umum' }}
                                 </span>

@@ -93,7 +93,6 @@
     @endpush
 
     <div class="container py-4" data-aos="fade-up" data-aos-duration="600">
-        {{-- HERO TEACHER --}}
         <div class="teacher-hero-card p-4 p-md-5 mb-4">
             <div class="row align-items-center g-4 position-relative" style="z-index:1;">
                 <div class="col-lg-8">
@@ -135,8 +134,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- STAT KECIL --}}
         <div class="row g-3 mb-4">
             <div class="col-md-3">
                 <div class="card stat-card h-100" data-aos="fade-up" data-aos-duration="500" data-aos-delay="50">
@@ -206,8 +203,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- COURSE DIBUAT TEACHER --}}
         <div class="row g-3">
             <div class="col-lg-7">
                 <div class="card border-0 shadow-sm rounded-4 h-100"
@@ -271,8 +266,6 @@
                     </div>
                 </div>
             </div>
-
-            {{-- RINGKASAN SISWA / AKTIVITAS --}}
             <div class="col-lg-5">
                 <div class="card border-0 shadow-sm rounded-4 h-100"
                      data-aos="fade-up" data-aos-duration="550" data-aos-delay="120">

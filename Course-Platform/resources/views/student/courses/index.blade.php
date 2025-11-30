@@ -102,7 +102,6 @@
     @endpush
 
     <div class="container py-4" data-aos="fade-up" data-aos-duration="600">
-        {{-- HERO SECTION KURSUS SAYA --}}
         <div class="mb-4">
             <div class="courses-hero-card p-3 p-md-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
                 <div class="d-flex align-items-start gap-3">
@@ -129,8 +128,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- CARD: GRID BOX KURSUS --}}
         <div class="card border-0 shadow-sm rounded-4" data-aos="fade-up" data-aos-duration="550" data-aos-delay="80">
             <div class="card-body">
 
@@ -147,12 +144,10 @@
                         Total: <strong>{{ $courses->count() }}</strong> kursus
                     </span>
                 </div>
-
-                {{-- GRID BOX --}}
                 <div class="row g-3">
                     @forelse($courses as $item)
                         @php
-                            $course   = $item->course ?? $item; // tergantung relasi
+                            $course   = $item->course ?? $item; 
                             $progress = $item->progress_percent ?? ($item->pivot->progress ?? 0);
                             $isDone   = $item->is_completed ?? ($item->pivot->is_completed ?? false);
                         @endphp
@@ -160,8 +155,6 @@
                         <div class="col-md-6 col-lg-4">
                             <div class="card course-card h-100" data-aos="fade-up" data-aos-duration="550">
                                 <div class="card-body d-flex flex-column">
-
-                                    {{-- HEADER KECIL DALAM BOX --}}
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <span class="badge bg-light text-muted border">
                                             {{ $course->category->name ?? 'Umum' }}
@@ -184,8 +177,6 @@
                                             </span>
                                         @endif
                                     </div>
-
-                                    {{-- JUDUL & PENGAJAR --}}
                                     <h3 class="course-title mb-1 text-truncate" title="{{ $course->title }}">
                                         {{ $course->title }}
                                     </h3>
@@ -193,8 +184,6 @@
                                         <i class="bi bi-person-workspace me-1"></i>
                                         {{ $course->teacher->name ?? '-' }}
                                     </p>
-
-                                    {{-- META RINGKAS --}}
                                     <p class="course-meta mb-3">
                                         <i class="bi bi-layers me-1"></i>
                                         {{ $course->modules->count() ?? 0 }} modul
@@ -202,8 +191,6 @@
                                         <i class="bi bi-people me-1"></i>
                                         {{ $course->students->count() ?? 0 }} siswa
                                     </p>
-
-                                    {{-- PROGRESS --}}
                                     <div class="mb-3">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <span class="text-muted small">Progres</span>
@@ -213,8 +200,6 @@
                                             <div class="progress-bar-brand" style="width: {{ $progress }}%"></div>
                                         </div>
                                     </div>
-
-                                    {{-- FOOTER BOX --}}
                                     <div class="mt-auto d-flex justify-content-between align-items-center course-footer-text">
                                         <span class="text-muted">
                                             @if($isDone)
@@ -260,8 +245,6 @@
                         </div>
                     @endforelse
                 </div>
-
-                {{-- PAGINATION (JIKA PAGINATOR) --}}
                 @if($courses instanceof \Illuminate\Pagination\AbstractPaginator)
                     <div class="mt-3">
                         {{ $courses->links() }}

@@ -45,13 +45,10 @@ class ModuleController extends Controller
             ->with('success', 'Modul berhasil dibuat.');
     }
 
-    // =========================
-    // SHALLOW ROUTES
-    // =========================
-
+  
     public function edit(Module $module)
     {
-        $course = $module->course; // ambil course dari module
+        $course = $module->course;
         $this->authorizeCourse($course);
 
         return view('teacher.modules.edit', compact('course', 'module'));
@@ -86,20 +83,15 @@ class ModuleController extends Controller
             ->with('success', 'Modul berhasil dihapus.');
     }
 
-    /**
-     * Admin boleh semua course.
-     * Teacher hanya course yang dia ajar.
-     */
+  
     protected function authorizeCourse(Course $course): void
     {
         $user = auth()->user();
 
-        // Admin boleh akses semua modul di semua course
         if ($user->role === 'admin') {
             return;
         }
 
-        // Teacher hanya boleh course miliknya
         if ($user->role === 'teacher' && $course->teacher_id === $user->id) {
             return;
         }

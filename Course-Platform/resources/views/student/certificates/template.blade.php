@@ -23,18 +23,16 @@
             position: relative;
         }
 
-        /* Bingkai luar emas */
         .border-outer {
-            border: 6px solid #b8860b; /* dark goldenrod */
+            border: 6px solid #b8860b; 
             width: 100%;
             height: 100%;
             box-sizing: border-box;
             padding: 6mm;
         }
 
-        /* Bingkai dalam */
         .border-inner {
-            border: 2px solid #d4af37; /* gold */
+            border: 2px solid #d4af37; 
             width: 100%;
             height: 100%;
             box-sizing: border-box;
@@ -199,15 +197,11 @@
     <div class="border-outer">
         <div class="border-inner">
 
-            {{-- Watermark teks besar di tengah --}}
             <div class="watermark">
                 CERTIFICATE
             </div>
-
-            {{-- Header: Logo + Nama Institusi --}}
             <div class="header">
                 @if(!empty($logoPath))
-                    {{-- Logo lokal, misal kirim dari controller pakai public_path() --}}
                     <img src="{{ $logoPath }}" class="logo" alt="Logo">
                 @endif
 
@@ -221,13 +215,11 @@
                 @endif
             </div>
 
-            {{-- Judul Sertifikat --}}
             <div class="certificate-title">
                 <h1>SERTIFIKAT</h1>
                 <div class="line"></div>
             </div>
 
-            {{-- Isi utama --}}
             <div class="content">
                 <div class="label-small">
                     Diberikan kepada:
@@ -255,7 +247,6 @@
                 @endif
             </div>
 
-            {{-- Info detail --}}
             <table class="info-row">
                 <tr>
                     <td class="info-label">Nama Peserta</td>
@@ -279,7 +270,6 @@
                 </tr>
             </table>
 
-            {{-- Footer: tanda tangan --}}
             <div class="footer">
                 <table class="footer-table">
                     <tr>
@@ -317,7 +307,6 @@
                 </table>
             </div>
 
-            {{-- Meta kecil di pojok --}}
             <div class="meta">
                 Kode: {{ $code }}
             </div>

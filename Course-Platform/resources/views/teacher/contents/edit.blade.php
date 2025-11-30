@@ -1,7 +1,5 @@
 <x-app-layout :title="'Edit Konten – '.$lesson->title">
     <div class="container py-4">
-
-        {{-- HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="h5 mb-1">Edit Konten Lesson</h1>
@@ -37,13 +35,7 @@
                       class="row g-4">
                     @csrf
                     @method('PUT')
-
-                    {{-- ========================= --}}
-                    {{-- KOLOM KIRI --}}
-                    {{-- ========================= --}}
                     <div class="col-lg-7">
-
-                        {{-- JENIS KONTEN --}}
                         <div class="mb-3">
                             <label class="form-label small d-block mb-2">Jenis Konten</label>
 
@@ -83,8 +75,6 @@
                             <div class="invalid-feedback small d-block">{{ $message }}</div>
                             @enderror
                         </div>
-
-                        {{-- JUDUL + URUTAN --}}
                         <div class="row g-3 mb-2">
                             <div class="col-md-8">
                                 <label class="form-label small">Judul Konten (opsional)</label>
@@ -102,8 +92,6 @@
                                 <div class="form-text small">Atur posisi konten.</div>
                             </div>
                         </div>
-
-                        {{-- BODY TEKS --}}
                         <div>
                             <label class="form-label small">Isi Teks (jika type = text)</label>
                             <textarea name="body" rows="6"
@@ -116,10 +104,6 @@
                         </div>
 
                     </div>
-
-                    {{-- ========================= --}}
-                    {{-- KOLOM KANAN --}}
-                    {{-- ========================= --}}
                     <div class="col-lg-5">
 
                         <div class="border rounded-3 p-3 bg-light-subtle">
@@ -127,8 +111,6 @@
                             <p class="small text-muted mb-3">
                                 Unggah ulang file/video jika ingin mengganti materi lama.
                             </p>
-
-                            {{-- FILE --}}
                             <div class="mb-3">
                                 <label class="form-label small">File Materi (type = file)</label>
                                 <input type="file" name="file_path"
@@ -147,8 +129,6 @@
                                     <div class="invalid-feedback small d-block">{{ $message }}</div>
                                 @enderror
                             </div>
-
-                            {{-- VIDEO --}}
                             <div class="mb-3">
                                 <label class="form-label small">File Video (type = video)</label>
                                 <input type="file" name="video_path"
@@ -171,10 +151,6 @@
                         </div>
 
                     </div>
-
-                    {{-- ========================= --}}
-                    {{-- ACTION BUTTONS --}}
-                    {{-- ========================= --}}
                     <div class="col-12 d-flex justify-content-end gap-2 mt-2">
                         <a href="{{ route('teacher.courses.modules.lessons.contents.index', [
                                 'course' => $course->id,

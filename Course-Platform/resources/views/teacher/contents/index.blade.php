@@ -1,7 +1,5 @@
 <x-app-layout :title="'Konten: '.$lesson->title">
     <div class="container py-4">
-
-        {{-- HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="h5 mb-1">Konten Lesson</h1>
@@ -13,7 +11,6 @@
             </div>
 
             <div class="d-flex gap-2">
-                {{-- KEMBALI KE DAFTAR LESSON --}}
                 <a href="{{ route('teacher.courses.modules.lessons.index', [
                         'course' => $lesson->module->course_id,
                         'module' => $lesson->module_id,
@@ -21,8 +18,6 @@
                    class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left me-1"></i> Kembali
                 </a>
-
-                {{-- TOMBOL TAMBAH KONTEN (nested route sudah benar) --}}
                 <a href="{{ route('teacher.courses.modules.lessons.contents.create', [
                         'course' => $lesson->module->course_id,
                         'module' => $lesson->module_id,
@@ -58,14 +53,11 @@
                         <tbody class="small">
                         @forelse($contents as $content)
                             <tr>
-                                {{-- URUTAN --}}
                                 <td>
                                     <span class="badge bg-primary-subtle text-primary rounded-pill px-3">
                                         {{ $content->order }}
                                     </span>
                                 </td>
-
-                                {{-- JENIS --}}
                                 <td>
                                     @php
                                         $label = strtoupper($content->type);
@@ -93,13 +85,9 @@
                                         </span>
                                     @endif
                                 </td>
-
-                                {{-- JUDUL --}}
                                 <td class="fw-semibold">
                                     {{ $content->title ?? '-' }}
                                 </td>
-
-                                {{-- DETAIL --}}
                                 <td class="text-muted">
                                     @if($content->type === 'text')
                                         {!! \Illuminate\Support\Str::limit(strip_tags($content->body), 80) !!}
@@ -137,16 +125,11 @@
                                         Quiz: {{ $content->quiz->title ?? '-' }}
                                     @endif
                                 </td>
-
-                                {{-- AKSI (tidak diubah warnanya) --}}
                                 <td class="text-end">
-                                    {{-- Edit konten (route shallow) --}}
                                     <a href="{{ route('teacher.contents.edit', $content) }}"
                                        class="btn btn-warning btn-sm">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
-
-                                    {{-- Hapus konten (route shallow) --}}
                                     <form action="{{ route('teacher.contents.destroy', $content) }}"
                                           method="POST" class="d-inline"
                                           onsubmit="return confirm('Hapus konten ini?')">

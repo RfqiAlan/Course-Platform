@@ -1,7 +1,5 @@
 <x-app-layout title="Kursus Saya – Teacher">
     <div class="container py-4">
-
-        {{-- HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="h5 mb-1">Kursus yang Saya Ajar</h1>
@@ -26,15 +24,11 @@
                 {{ session('success') }}
             </div>
         @endif
-
-        {{-- GRID COURSE PER BOX --}}
         <div class="row g-3">
             @forelse($courses as $course)
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 border-0 shadow-sm rounded-4">
                         <div class="card-body d-flex flex-column">
-
-                            {{-- TOP ROW: STATUS + KATEGORI --}}
                             <div class="d-flex justify-content-between align-items-start mb-2 small">
                                 <span class="badge bg-light text-muted">
                                     {{ $course->category->name ?? 'Umum' }}
@@ -50,19 +44,13 @@
                                     </span>
                                 @endif
                             </div>
-
-                            {{-- TITLE --}}
                             <h2 class="h6 fw-semibold mb-1 text-truncate" title="{{ $course->title }}">
                                 {{ $course->title }}
                             </h2>
-
-                            {{-- TEACHER --}}
                             <p class="small text-muted mb-1">
                                 <i class="bi bi-person-workspace me-1"></i>
                                 {{ $course->teacher->name ?? 'Pengajar' }}
                             </p>
-
-                            {{-- TANGGAL COURSE --}}
                             <p class="small text-muted mb-2">
                                 <i class="bi bi-calendar-event me-1"></i>
                                 @if($course->start_date || $course->end_date)
@@ -78,13 +66,9 @@
                                     Dibuat: {{ optional($course->created_at)->format('d M Y') }}
                                 @endif
                             </p>
-
-                            {{-- DESCRIPTION (SINGKAT) --}}
                             <p class="small text-muted mb-3" style="min-height: 2.8em;">
                                 {{ \Illuminate\Support\Str::limit($course->description, 80) }}
                             </p>
-
-                            {{-- META: siswa & modul --}}
                             <div class="d-flex justify-content-between small text-muted mb-3">
                                 <span>
                                     <i class="bi bi-people me-1"></i>
@@ -95,8 +79,6 @@
                                     {{ $course->modules->count() }} modul
                                 </span>
                             </div>
-
-                            {{-- ACTION BUTTONS --}}
                             <div class="mt-auto d-flex flex-column gap-2">
                                 <a href="{{ route('teacher.courses.show', $course) }}"
                                    class="btn btn-sm btn-outline-primary w-100">
@@ -142,8 +124,6 @@
                 </div>
             @endforelse
         </div>
-
-        {{-- PAGINATION --}}
         <div class="mt-3">
             {{ $courses->links() }}
         </div>

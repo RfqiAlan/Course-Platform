@@ -1,7 +1,5 @@
 <x-app-layout :title="'Tambah Konten – '.$lesson->title">
     <div class="container py-4">
-
-        {{-- HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="h5 mb-1">Tambah Konten Lesson</h1>
@@ -11,8 +9,6 @@
                     Kursus: <strong>{{ $course->title }}</strong>
                 </p>
             </div>
-
-            {{-- Kembali ke daftar konten --}}
             <a href="{{ route('teacher.courses.modules.lessons.contents.index', [
                     'course' => $lesson->module->course_id,
                     'module' => $lesson->module_id,
@@ -25,8 +21,6 @@
 
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4 p-md-5">
-
-                {{-- SECTION TITLE --}}
                 <div class="mb-4">
                     <h2 class="h6 mb-1">Detail Konten</h2>
                     <p class="small text-muted mb-0">
@@ -41,11 +35,7 @@
                     ]) }}"
                       method="POST" enctype="multipart/form-data" class="row g-4">
                     @csrf
-
-                    {{-- KOLOM KIRI: TIPE, JUDUL, URUTAN, TEKS --}}
                     <div class="col-lg-7">
-
-                        {{-- JENIS KONTEN - PILL BUTTON GROUP --}}
                         <div class="mb-3">
                             <label class="form-label small d-block mb-2">Jenis Konten</label>
 
@@ -84,8 +74,6 @@
                             @else
                             @enderror
                         </div>
-
-                        {{-- JUDUL & URUTAN --}}
                         <div class="row g-3 mb-2">
                             <div class="col-md-8">
                                 <label class="form-label small">Judul Konten (opsional)</label>
@@ -100,8 +88,6 @@
                                        class="form-control form-control-sm">
                             </div>
                         </div>
-
-                        {{-- TEKS KONTEN --}}
                         <div>
                             <label class="form-label small">Isi Teks (jika type = text)</label>
                             <textarea name="body" rows="6"
@@ -113,14 +99,11 @@
                             @enderror
                         </div>
                     </div>
-
-                    {{-- KOLOM KANAN: LAMPIRAN FILE & VIDEO --}}
                     <div class="col-lg-5">
 
                         <div class="border rounded-3 p-3 p-md-3 bg-light-subtle mb-3">
                             <h3 class="h6 mb-2">Lampiran Materi</h3>
                           
-                            {{-- FILE MATERI --}}
                             <div class="mb-3">
                                 <label class="form-label small">File Materi (jika type = file)</label>
                                 <input type="file" name="file"
@@ -130,8 +113,6 @@
                                     <div class="invalid-feedback small d-block">{{ $message }}</div>
                                 @enderror
                             </div>
-
-                            {{-- FILE VIDEO --}}
                             <div>
                                 <label class="form-label small">File Video (jika type = video)</label>
                                 <input type="file" name="video"
@@ -146,8 +127,6 @@
                         </div>
 
                     </div>
-
-                    {{-- ACTION BUTTONS --}}
                     <div class="col-12 d-flex justify-content-end gap-2 mt-2">
                         <a href="{{ route('teacher.courses.modules.lessons.contents.index', [
                                 'course' => $lesson->module->course_id,

@@ -9,11 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class CertificateController extends Controller
 {
-    /**
-     * Tampilkan daftar semua sertifikat milik student yang login.
-     * Route (contoh):
-     * GET /student/certificates  ->  student.certificates.index
-     */
+  
     public function index()
     {
         $user = auth()->user();
@@ -26,11 +22,7 @@ class CertificateController extends Controller
         return view('student.certificates.index', compact('certificates'));
     }
 
-    /**
-     * Tampilkan detail satu sertifikat berdasarkan ID sertifikat.
-     * Route (contoh):
-     * GET /student/certificates/{certificate}  ->  student.certificates.show
-     */
+  
     public function show(Certificate $certificate)
     {
         $user = auth()->user();

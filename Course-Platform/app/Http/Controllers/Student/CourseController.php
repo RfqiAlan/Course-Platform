@@ -7,12 +7,12 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Category;
 use App\Models\LessonUserProgress;
-use App\Models\DiscussionMessage; // ⬅️ TAMBAHAN: untuk ambil data diskusi
+use App\Models\DiscussionMessage; 
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
-    // DETAIL COURSE (versi sederhana, silakan sesuaikan view kalau perlu)
+    // DETAIL COURSE
     public function show(Course $course)
     {
         $course->load('category', 'teacher', 'modules.lessons', 'students');
@@ -20,10 +20,7 @@ class CourseController extends Controller
         return view('courses.show', compact('course'));
     }
 
-    /**
-     * Katalog kursus (guest & student)
-     * Route: GET /courses  ->  name: courses.index
-     */
+   
     public function catalog(Request $request)
     {
         $search     = $request->query('search', '');
@@ -185,11 +182,7 @@ class CourseController extends Controller
         ]);
     }
 
-    /**
-     * HALAMAN BELAJAR + REGULASI MARK AS DONE
-     * Route: GET /student/courses/{course}/learn  →  student.courses.learn
-     * Query: ?lesson={lesson_id} (opsional)
-     */
+  
     public function learn(Request $request, Course $course)
     {
         $user = $request->user();
@@ -212,7 +205,7 @@ class CourseController extends Controller
             },
         ]);
 
-        // ⬇️ AMBIL SEMUA DISKUSI UNTUK COURSE INI
+        // ⬇ AMBIL SEMUA DISKUSI UNTUK COURSE INI
         $discussions = DiscussionMessage::where('course_id', $course->id)
             ->with('user')
             ->orderBy('created_at')
@@ -230,7 +223,7 @@ class CourseController extends Controller
                 'currentLesson'    => null,
                 'doneLessonIds'    => [],
                 'allowedLessonIds' => [],
-                'discussions'      => $discussions, // ⬅️ penting
+                'discussions'      => $discussions, 
             ]);
         }
 
@@ -262,10 +255,8 @@ class CourseController extends Controller
 
             $currentLesson = $firstNotDone ?: $allLessons->first();
         }
-
-        // ===============================
+        
         // TENTUKAN LESSON YANG BOLEH DIAKSES
-        // ===============================
         $allowedLessonIds = [];
         $firstLockedFound = false;
 

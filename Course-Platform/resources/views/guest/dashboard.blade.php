@@ -146,9 +146,6 @@
 
     <div class="container py-3">
 
-        {{-- ======================= --}}
-        {{-- HERO SECTION (NO IMAGE) --}}
-        {{-- ======================= --}}
         <section class="hero-edvo mb-5">
             <div class="hero-blob-left"></div>
             <div class="hero-blob-right"></div>
@@ -175,8 +172,6 @@
                         Akses <strong>1000+ course</strong> teknologi, data, desain, dan karier dari pengajar
                         berpengalaman. Belajar fleksibel, progress terekam, dan dapatkan sertifikat resmi EDVO.
                     </p>
-
-                    {{-- CTA BUTTONS --}}
                     <div class="hero-actions d-flex flex-wrap justify-content-center gap-3 mb-3">
                         <a href="{{ route('courses.index') }}"
                            class="btn btn-primary btn-lg px-4 py-2 d-inline-flex align-items-center gap-2"
@@ -207,8 +202,6 @@
                             <span>Sertifikat resmi bisa untuk CV</span>
                         </div>
                     </div>
-
-                    {{-- STATISTICS --}}
                     <div class="d-flex flex-wrap hero-stat-wrap justify-content-center gap-3 mt-2">
                         <div class="hero-stat-card">
                             <div class="hero-stat-number" style="color:#FFC400;">1000+</div>
@@ -229,10 +222,6 @@
                 </div>
             </div>
         </section>
-
-        {{-- ======================= --}}
-        {{-- FITUR / CARA KERJA --}}
-        {{-- ======================= --}}
         <section id="fitur" class="mt-2 pt-1">
             <div class="row align-items-end mb-4">
                 <div class="col-lg-8">
@@ -246,7 +235,6 @@
             </div>
 
             <div class="row g-4">
-                {{-- Step 1 --}}
                 <div class="col-md-4">
                     <div class="card border feature-card h-100 shadow-sm rounded-4">
                         <div class="card-body p-4">
@@ -267,8 +255,6 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- Step 2 --}}
                 <div class="col-md-4">
                     <div class="card border feature-card h-100 shadow-sm rounded-4">
                         <div class="card-body p-4">
@@ -288,8 +274,6 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- Step 3 --}}
                 <div class="col-md-4">
                     <div class="card border feature-card h-100 shadow-sm rounded-4">
                         <div class="card-body p-4">

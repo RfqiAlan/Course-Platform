@@ -9,10 +9,8 @@ use Illuminate\Http\Request;
 
 class DiscussionController extends Controller
 {
-    // HALAMAN KHUSUS DISKUSI COURSE UNTUK GURU
     public function index(Course $course)
     {
-        // pastikan course milik guru ini (opsional tapi bagus)
         if ($course->teacher_id !== auth()->id()) {
             abort(403);
         }
@@ -28,7 +26,6 @@ class DiscussionController extends Controller
         ]);
     }
 
-    // GURU MENGIRIM PESAN DISKUSI
     public function store(Request $request, Course $course)
     {
         $data = $request->validate([
@@ -45,7 +42,6 @@ class DiscussionController extends Controller
             'message'   => $data['message'],
         ]);
 
-        // balik ke halaman sebelumnya (bisa /learn student atau /teacher/courses/{course}/discussion)
         return back();
     }
 }

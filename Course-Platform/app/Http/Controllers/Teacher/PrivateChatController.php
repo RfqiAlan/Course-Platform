@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class PrivateChatController extends Controller
 {
-    // daftar semua chat privat yg masuk ke guru
     public function index()
     {
         $teacher = auth()->user();
@@ -22,7 +21,6 @@ class PrivateChatController extends Controller
         return view('teacher.chat.index', compact('threads'));
     }
 
-    // detail chat dengan 1 student
     public function show(PrivateThread $thread)
     {
         $teacher = auth()->user();
@@ -39,7 +37,6 @@ class PrivateChatController extends Controller
         return view('teacher.chat.show', compact('thread', 'messages'));
     }
 
-    // guru kirim pesan
     public function store(Request $request, PrivateThread $thread)
     {
         $teacher = auth()->user();

@@ -1,7 +1,6 @@
 <x-app-layout title="Manajemen User – Admin">
     <div class="container py-4">
 
-        {{-- PAGE HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="h5 mb-1">Manajemen User</h1>
@@ -13,14 +12,11 @@
             </a>
         </div>
 
-        {{-- CARD WRAPPER --}}
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body">
 
-                {{-- FILTER BAR --}}
                 <form method="GET" class="row g-3 align-items-end mb-4 small">
 
-                    {{-- Search --}}
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Cari User</label>
                         <div class="input-group input-group-sm">
@@ -33,7 +29,6 @@
                         </div>
                     </div>
 
-                    {{-- Role Filter --}}
                     <div class="col-md-3">
                         <label class="form-label fw-semibold">Role</label>
                         <select name="role" class="form-select form-select-sm">
@@ -44,7 +39,6 @@
                         </select>
                     </div>
 
-                    {{-- Status Filter --}}
                     <div class="col-md-3">
                         <label class="form-label fw-semibold">Status</label>
                         <select name="status" class="form-select form-select-sm">
@@ -53,8 +47,6 @@
                             <option value="inactive" @selected(request('status')==='inactive')>Nonaktif</option>
                         </select>
                     </div>
-
-                    {{-- Apply --}}
                     <div class="col-md-2">
                         <button class="btn btn-outline-primary btn-sm w-100">
                             Terapkan
@@ -62,8 +54,6 @@
                     </div>
 
                 </form>
-
-                {{-- SUCCESS ALERT --}}
                 @if(session('success'))
                     <div class="alert alert-success border-0 small d-flex align-items-center mb-3">
                         <i class="bi bi-check-circle me-2"></i>
@@ -71,7 +61,6 @@
                     </div>
                 @endif
 
-                {{-- USER TABLE --}}
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
                         <thead class="table-light small">
@@ -118,13 +107,11 @@
 
                                     <td class="text-end">
 
-                                        {{-- EDIT --}}
                                         <a href="{{ route('admin.users.edit', $user) }}"
                                            class="btn btn-warning btn-sm">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
 
-                                        {{-- DELETE --}}
                                         @if(auth()->id() !== $user->id)
                                             <form action="{{ route('admin.users.destroy', $user) }}"
                                                   method="POST"
@@ -157,7 +144,6 @@
                     </table>
                 </div>
 
-                {{-- PAGINATION --}}
                 <div class="mt-3">
                     {{ $users->withQueryString()->links() }}
                 </div>

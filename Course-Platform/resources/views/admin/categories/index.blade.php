@@ -2,7 +2,6 @@
     <div class="py-4">
         <div class="container">
 
-            {{-- HEADER --}}
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="h4 mb-1">Kategori Kursus</h1>
@@ -16,11 +15,9 @@
                 </a>
             </div>
 
-            {{-- CARD LIST --}}
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body">
 
-                    {{-- ALERT --}}
                     @if(session('success'))
                         <div class="alert alert-success border-0 small d-flex align-items-center mb-3">
                             <i class="bi bi-check-circle me-2"></i>
@@ -28,7 +25,6 @@
                         </div>
                     @endif
 
-                    {{-- TABLE --}}
                     <div class="table-responsive">
                         <table class="table align-middle mb-0">
                             <thead class="table-light small">
@@ -92,7 +88,6 @@
                         </table>
                     </div>
 
-                    {{-- PAGINATION --}}
                     @if($categories->hasPages())
                         <div class="mt-3">
                             {{ $categories->links() }}

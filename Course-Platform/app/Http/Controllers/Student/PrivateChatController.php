@@ -10,13 +10,7 @@ use Illuminate\Http\Request;
 
 class PrivateChatController extends Controller
 {
-    /**
-     * Student kirim pesan ke guru di course tertentu.
-     * Dipanggil dari floating chat di halaman learn.
-     *
-     * Route: POST /student/courses/{course}/chat
-     * Name : student.courses.chat.store
-     */
+ 
     public function store(Request $request, Course $course)
     {
         $student = auth()->user();
@@ -25,9 +19,8 @@ class PrivateChatController extends Controller
             'message' => ['required', 'string'],
         ]);
 
-        $teacher = $course->teacher; // pastikan relasi course->teacher sudah ada
+        $teacher = $course->teacher; // pastikan relasi course->teacher 
 
-        // cari/buat thread
         $thread = PrivateThread::firstOrCreate([
             'course_id'  => $course->id,
             'teacher_id' => $teacher->id,

@@ -10,11 +10,7 @@ use Illuminate\Http\Request;
 
 class LessonController extends Controller
 {
-    /**
-     * List semua lesson dalam satu module (nested).
-     * Route: teacher.courses.modules.lessons.index
-     * URL  : /teacher/courses/{course}/modules/{module}/lessons
-     */
+  
     public function index(Course $course, Module $module)
     {
         $this->authorizeCourse($course);
@@ -27,10 +23,7 @@ class LessonController extends Controller
         return view('teacher.lessons.index', compact('course', 'module', 'lessons'));
     }
 
-    /**
-     * Form tambah lesson (nested).
-     * Route: teacher.courses.modules.lessons.create
-     */
+
     public function create(Course $course, Module $module)
     {
         $this->authorizeCourse($course);
@@ -39,10 +32,7 @@ class LessonController extends Controller
         return view('teacher.lessons.create', compact('course', 'module'));
     }
 
-    /**
-     * Simpan lesson baru (nested).
-     * Route: teacher.courses.modules.lessons.store
-     */
+
     public function store(Request $request, Course $course, Module $module)
     {
         $this->authorizeCourse($course);
@@ -54,7 +44,6 @@ class LessonController extends Controller
             'order'   => 'nullable|integer',
         ]);
 
-        // kalau order kosong, auto di-set max+1
         if (! isset($data['order']) || $data['order'] === '' || $data['order'] === null) {
             $maxOrder = $module->lessons()->max('order'); // bisa null
             $data['order'] = ($maxOrder ?? 0) + 1;
@@ -72,11 +61,6 @@ class LessonController extends Controller
             ->with('success', 'Lesson berhasil dibuat.');
     }
 
-    /**
-     * Detail 1 lesson (shallow).
-     * Route: teacher.lessons.show
-     * URL  : /teacher/lessons/{lesson}
-     */
     public function show(Lesson $lesson)
     {
         $module = $lesson->module;
@@ -87,11 +71,6 @@ class LessonController extends Controller
         return view('teacher.lessons.show', compact('course', 'module', 'lesson'));
     }
 
-    /**
-     * Form edit lesson (shallow).
-     * Route: teacher.lessons.edit
-     * URL  : /teacher/lessons/{lesson}/edit
-     */
     public function edit(Lesson $lesson)
     {
         $module = $lesson->module;
@@ -101,12 +80,6 @@ class LessonController extends Controller
 
         return view('teacher.lessons.edit', compact('course', 'module', 'lesson'));
     }
-
-    /**
-     * Update lesson (shallow).
-     * Route: teacher.lessons.update
-     * URL  : /teacher/lessons/{lesson}
-     */
     public function update(Request $request, Lesson $lesson)
     {
         $module = $lesson->module;
@@ -130,11 +103,7 @@ class LessonController extends Controller
             ->with('success', 'Lesson berhasil diupdate.');
     }
 
-    /**
-     * Hapus lesson (shallow).
-     * Route: teacher.lessons.destroy
-     * URL  : /teacher/lessons/{lesson}
-     */
+
     public function destroy(Lesson $lesson)
     {
         $module = $lesson->module;
@@ -152,11 +121,7 @@ class LessonController extends Controller
             ->with('success', 'Lesson berhasil dihapus.');
     }
 
-    /**
-     * Akses course:
-     * - Admin  : boleh semua
-     * - Teacher: hanya course yang dia ajar
-     */
+
     protected function authorizeCourse(Course $course): void
     {
         $user = auth()->user();

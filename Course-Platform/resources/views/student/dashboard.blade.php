@@ -1,6 +1,5 @@
 <x-app-layout title="Dashboard Student – EDVO">
     <div class="container py-4" data-aos="fade-up" data-aos-duration="600">
-        {{-- Header --}}
         <div class="mb-3">
             <h1 class="h5 mb-1">Halo, {{ auth()->user()->name }}</h1>
             <p class="small text-muted mb-0">
@@ -9,7 +8,6 @@
             </p>
         </div>
 
-        {{-- Stat cards --}}
         <div class="row g-3 mb-4">
             <div class="col-md-4">
                 <div class="card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden"
@@ -63,7 +61,6 @@
             </div>
         </div>
 
-        {{-- Kursus yang sedang diikuti --}}
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h2 class="h6 mb-0">Lanjutkan Belajar</h2>
             <a href="{{ route('student.courses.index') }}" class="small text-decoration-none"
@@ -75,7 +72,7 @@
         <div class="row g-3">
             @forelse($recentCourses ?? [] as $item)
                 @php
-                    $course = $item->course ?? $item; // tergantung struktur relasi kamu
+                    $course = $item->course ?? $item; 
                     $progress = $item->progress_percent ?? 0;
                 @endphp
                 <div class="col-md-4">

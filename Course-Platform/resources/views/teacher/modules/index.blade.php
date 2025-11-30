@@ -5,7 +5,6 @@
         ? route('admin.courses.index')
         : route('teacher.courses.index');
 @endphp
-        {{-- HEADER --}}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="h5 mb-1">Modul Kursus</h1>
@@ -15,7 +14,6 @@
     </div>
 
     <div class="d-flex gap-2">
-        {{-- BACK BUTTON DINAMIS --}}
         <a href="{{ $backUrl }}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left me-1"></i> Kembali
         </a>
@@ -26,8 +24,6 @@
         </a>
     </div>
 </div>
-
-        {{-- CARD --}}
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body">
 
@@ -44,35 +40,25 @@
                         <tbody class="small">
                         @forelse($modules as $module)
                             <tr>
-                                {{-- URUTAN --}}
                                 <td>
                                     <span class="badge bg-primary-subtle text-primary rounded-pill px-3">
                                         {{ $module->order }}
                                     </span>
                                 </td>
-
-                                {{-- JUDUL --}}
                                 <td class="fw-semibold">
                                     {{ $module->title }}
                                 </td>
-
-                                {{-- JUMLAH LESSON (STYLE BARU) --}}
                                 <td>
                                     <span class="badge bg-light text-muted border d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill">
                                         <i class="bi bi-journal-text"></i>
                                         {{ $module->lessons->count() }} lesson
                                     </span>
                                 </td>
-
-                                {{-- AKSI (TIDAK DIUBAH) --}}
                                 <td class="text-end">
-                                    {{-- EDIT (shallow) --}}
                                     <a href="{{ route('teacher.modules.edit', $module) }}"
                                        class="btn btn-warning btn-sm">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
-
-                                    {{-- LIHAT LESSON: pakai route nested --}}
                                     <a href="{{ route('teacher.courses.modules.lessons.index', [
                                                 'course' => $course->id,
                                                 'module' => $module->id,
@@ -80,8 +66,6 @@
                                        class="btn btn-outline-primary btn-sm">
                                         <i class="bi bi-list-task me-1"></i> Lesson
                                     </a>
-
-                                    {{-- HAPUS (shallow) --}}
                                     <form action="{{ route('teacher.modules.destroy', $module) }}"
                                           method="POST" class="d-inline"
                                           onsubmit="return confirm('Hapus modul ini beserta lesson-nya?')">

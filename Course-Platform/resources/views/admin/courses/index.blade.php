@@ -2,7 +2,6 @@
     <div class="py-4">
         <div class="container">
 
-            {{-- PAGE HEADER --}}
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="h4 mb-1">Manajemen Course</h1>
@@ -15,9 +14,7 @@
                 </a>
             </div>
 
-            {{-- CARD WRAPPER --}}
             <div class="card border-0 shadow-sm rounded-4">
-                {{-- CARD HEADER: FILTERS --}}
                 <div class="card-header bg-white border-0 pb-0">
                     @if(session('success'))
                         <div class="alert alert-success border-0 small d-flex align-items-center mb-3">
@@ -44,7 +41,6 @@
                     </div>
 
                     <form method="GET" class="row g-2 align-items-center small mb-3">
-                        {{-- SEARCH --}}
                         <div class="col-md-4">
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-white border-end-0">
@@ -59,7 +55,6 @@
                             </div>
                         </div>
 
-                        {{-- CATEGORY FILTER --}}
                         <div class="col-md-3">
                             <select name="category" class="form-select form-select-sm">
                                 <option value="">Semua kategori</option>
@@ -71,7 +66,6 @@
                             </select>
                         </div>
 
-                        {{-- STATUS FILTER --}}
                         <div class="col-md-3">
                             <select name="status" class="form-select form-select-sm">
                                 <option value="">Semua status</option>
@@ -80,7 +74,6 @@
                             </select>
                         </div>
 
-                        {{-- APPLY BUTTON --}}
                         <div class="col-md-2 text-md-end">
                             <button class="btn btn-outline-primary btn-sm w-100">
                                 Terapkan
@@ -88,8 +81,6 @@
                         </div>
                     </form>
                 </div>
-
-                {{-- CARD BODY: TABLE --}}
                 <div class="card-body pt-0">
                     <div class="table-responsive">
                         <table class="table align-middle mb-0">
@@ -107,10 +98,7 @@
                             <tbody class="small">
                                 @forelse($courses as $course)
                                     <tr>
-                                        {{-- NOMOR --}}
                                         <td>{{ $loop->iteration + ($courses->firstItem() - 1) }}</td>
-
-                                        {{-- JUDUL + LINK PUBLIC --}}
                                         <td>
                                             <div class="fw-semibold mb-0">
                                                 <a href="{{ route('courses.show', $course) }}"
@@ -124,7 +112,6 @@
                                             </div>
                                         </td>
 
-                                        {{-- TEACHER --}}
                                         <td>
                                             @if($course->teacher)
                                                 <div class="d-flex align-items-center gap-2">
@@ -146,7 +133,6 @@
                                             @endif
                                         </td>
 
-                                        {{-- KATEGORI --}}
                                         <td>
                                             @if($course->category)
                                                 <span class="badge rounded-pill text-bg-light">
@@ -157,7 +143,6 @@
                                             @endif
                                         </td>
 
-                                        {{-- STATUS --}}
                                         <td>
                                             @if($course->is_active)
                                                 <span class="badge bg-success-subtle text-success rounded-pill">
@@ -170,28 +155,21 @@
                                             @endif
                                         </td>
 
-                                        {{-- TOTAL SISWA --}}
                                         <td class="text-center">
                                             {{ $course->students()->count() }}
                                         </td>
 
-                                        {{-- AKSI --}}
                                         <td class="text-end">
-                                            {{-- KELola MODUL & MATERI (AREA TEACHER) --}}
                                             <a href="{{ route('teacher.courses.modules.index', ['course' => $course->id]) }}"
                                                class="btn btn-outline-primary btn-sm me-1"
                                                title="Kelola modul & materi">
                                                 <i class="bi bi-kanban"></i>
                                             </a>
-
-                                            {{-- EDIT COURSE (META) --}}
                                             <a href="{{ route('admin.courses.edit', $course) }}
                                                "class="btn btn-outline-secondary btn-sm me-1"
                                                title="Edit course">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
-
-                                            {{-- HAPUS COURSE --}}
                                             <form action="{{ route('admin.courses.destroy', $course) }}"
                                                   method="POST"
                                                   class="d-inline"
@@ -228,8 +206,6 @@
                             </tbody>
                         </table>
                     </div>
-
-                    {{-- PAGINATION --}}
                     @if($courses->hasPages())
                         <div class="mt-3">
                             {{ $courses->withQueryString()->links() }}

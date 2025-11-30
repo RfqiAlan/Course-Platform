@@ -107,10 +107,8 @@
 
                             <hr class="my-3">
 
-                            {{-- ===== LOOP KONTEN LESSON ===== --}}
                             @forelse($currentLesson->contents as $content)
 
-                                {{-- TEXT --}}
                                 @if($content->type === 'text')
                                     <div class="mb-4">
                                         @if($content->title)
@@ -123,7 +121,6 @@
                                     </div>
                                 @endif
 
-                                {{-- FILE (dokumen / gambar) --}}
                                 @if($content->type === 'file')
                                     @php
                                         $extension = $content->file_path
@@ -165,7 +162,6 @@
                                     @endif
                                 @endif
 
-                                {{-- VIDEO --}}
                                 @if($content->type === 'video')
                                     <div class="mb-4">
                                         @if($content->title)
@@ -192,8 +188,6 @@
                             @endforelse
 
                             <hr>
-
-                            {{-- ===== BUTTON MARK AS DONE ===== --}}
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
                                     <form action="{{ route('student.lessons.mark-done', $currentLesson) }}"
@@ -216,9 +210,7 @@
                                 </div>
                             </div>
 
-                            {{-- ===== NEXT / PREVIOUS ===== --}}
                             <div class="d-flex justify-content-between">
-                                {{-- PREVIOUS --}}
                                 @php
                                     $prev = $course->getPrevLesson($currentLesson);
                                 @endphp
@@ -234,7 +226,6 @@
                                     <span></span>
                                 @endif
 
-                                {{-- NEXT --}}
                                 @php
                                     $next = $course->getNextLesson($currentLesson);
                                 @endphp
@@ -256,7 +247,6 @@
                             </div>
 
                         @else
-                            {{-- JIKA BELUM PILIH LESSON --}}
                             <div class="text-center py-5">
                                 <i class="bi bi-journal-bookmark fs-1 text-primary"></i>
                                 <h5 class="mt-3 fw-semibold">Pilih Lesson untuk Mulai Belajar</h5>
@@ -267,10 +257,8 @@
                     </div>
                 </div>
 
-                {{-- LIVE CHAT --}}
                 <div class="row g-3 mt-3">
                     <div class="col-lg-6">
-                        {{-- ⬇️ kirim juga $discussions ke komponen --}}
                         @include('components.course-discussion-box', [
                             'course' => $course,
                             'discussions' => $discussions ?? [],
@@ -281,7 +269,7 @@
                     </div>
                 </div>
 
-            </div> {{-- /col-lg-9 --}}
+            </div> 
         </div>
     </div>
 </x-app-layout>

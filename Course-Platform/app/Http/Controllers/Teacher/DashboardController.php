@@ -15,12 +15,10 @@ class DashboardController extends Controller
     {
         $teacher = auth()->user();
 
-        // Course yang dia ajar
         $coursesQuery = Course::where('teacher_id', $teacher->id);
 
         $totalCourses = (clone $coursesQuery)->count();
 
-        // Modul & lesson dari course yang dia ajar
         $courseIds = (clone $coursesQuery)->pluck('id');
 
         $totalModules = Module::whereIn('course_id', $courseIds)->count();
@@ -28,7 +26,6 @@ class DashboardController extends Controller
             $q->select('id')->from('modules')->whereIn('course_id', $courseIds);
         })->count();
 
-        // Enrollments & siswa unik
         $totalEnrollments = DB::table('course_student')
             ->whereIn('course_id', $courseIds)
             ->count();
@@ -41,10 +38,8 @@ class DashboardController extends Controller
         $avgModulesPerCourse   = $totalCourses > 0 ? round($totalModules / $totalCourses, 1) : 0;
         $avgStudentsPerCourse  = $totalCourses > 0 ? round($totalStudents / $totalCourses, 1) : 0;
 
-        // Sertifikat terbit untuk course yang dia ajar
         $totalCertificates = Certificate::whereIn('course_id', $courseIds)->count();
 
-        // Course terbaru
         $recentCourses = (clone $coursesQuery)
             ->with(['category', 'students'])
             ->withCount('students')

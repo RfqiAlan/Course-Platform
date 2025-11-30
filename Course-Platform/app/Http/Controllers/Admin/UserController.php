@@ -88,7 +88,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        // boleh juga pakai soft delete kalau modelnya pakai SoftDeletes
+        
         $user->delete();
 
         return redirect()->route('admin.users.index')

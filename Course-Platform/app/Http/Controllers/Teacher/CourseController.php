@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
-    // LIST COURSE MILIK TEACHER
     public function index(Request $request)
     {
         $user = $request->user();
@@ -24,7 +23,6 @@ class CourseController extends Controller
         return view('teacher.courses.index', compact('courses'));
     }
 
-    // FORM BUAT COURSE
     public function create()
     {
         $categories = Category::orderBy('name')->get();
@@ -32,7 +30,6 @@ class CourseController extends Controller
         return view('teacher.courses.create', compact('categories'));
     }
 
-    // SIMPAN COURSE BARU
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -54,15 +51,12 @@ class CourseController extends Controller
             ->with('success', 'Course berhasil dibuat.');
     }
 
-    // DETAIL COURSE (UNTUK TEACHER)
     public function show(Course $course)
     {
-        // Pastikan course ini milik teacher yang login
         if ($course->teacher_id !== auth()->id()) {
             abort(403);
         }
 
-        // Load relasi untuk tampilan
         $course->load([
             'category',
             'modules.lessons' => function ($q) {
@@ -71,7 +65,6 @@ class CourseController extends Controller
             'students',
         ]);
 
-        // ⬇️ AMBIL SEMUA DISKUSI UNTUK COURSE INI
         $discussions = DiscussionMessage::where('course_id', $course->id)
             ->with('user')
             ->orderBy('created_at')
@@ -83,7 +76,6 @@ class CourseController extends Controller
         ]);
     }
 
-    // FORM EDIT COURSE
     public function edit(Course $course)
     {
         if ($course->teacher_id !== auth()->id()) {
@@ -98,7 +90,6 @@ class CourseController extends Controller
         ]);
     }
 
-    // UPDATE COURSE
     public function update(Request $request, Course $course)
     {
         if ($course->teacher_id !== auth()->id()) {
@@ -122,7 +113,6 @@ class CourseController extends Controller
             ->with('success', 'Course berhasil diperbarui.');
     }
 
-    // HAPUS COURSE
     public function destroy(Course $course)
     {
         if ($course->teacher_id !== auth()->id()) {

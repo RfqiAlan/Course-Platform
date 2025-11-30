@@ -11,14 +11,10 @@ use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
-    /**
-     * List course + filter search, kategori, status.
-     * View  : resources/views/admin/courses/index.blade.php
-     * Route : admin.courses.index
-     */
+    
     public function index(Request $request)
     {
-        // ambil parameter dari form (name="search", "category", "status")
+        
         $search     = $request->input('search');
         $categoryId = $request->input('category');
         $status     = $request->input('status'); // 'active' / 'inactive' / null
@@ -116,7 +112,6 @@ class CourseController extends Controller
             'is_active'   => 'nullable|boolean',
         ]);
 
-        // regenerate slug kalau judul berubah
         if ($data['title'] !== $course->title) {
             $data['slug'] = Str::slug($data['title']) . '-' . Str::random(4);
         }

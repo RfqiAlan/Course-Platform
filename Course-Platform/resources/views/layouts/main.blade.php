@@ -5,21 +5,16 @@
     <title>@yield('title', 'EDVO')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    {{-- Tailwind + JS dari Vite --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    {{-- Bootstrap Icons (hanya untuk icon, tidak pakai CSS layoutnya) --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-    {{-- AOS (Animate On Scroll) --}}
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
-    {{-- Alpine.js untuk mobile navbar --}}
     <script src="https://unpkg.com/alpinejs" defer></script>
 
     <style>
         :root {
-            /* Warna brand */
             --brand-primary: #0F3D73;
         }
 
@@ -34,7 +29,6 @@
 </head>
 <body class="min-h-screen text-slate-900 flex flex-col">
 
-{{-- NAVBAR --}}
 <header
     class="sticky top-0 z-30 border-b border-slate-100 bg-white/90 backdrop-blur"
     data-aos="fade-down"
@@ -43,7 +37,6 @@
 >
     <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex h-14 items-center justify-between">
-            {{-- Brand --}}
             <a href="{{ route('home') }}" class="flex items-center gap-2">
                 <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#0F3D73]/10">
                     <i class="bi bi-mortarboard-fill text-xl" style="color:#0F3D73"></i>
@@ -52,7 +45,6 @@
                 </div>
             </a>
 
-            {{-- Desktop nav --}}
             <div class="hidden items-center gap-6 md:flex">
                 <a href="{{ route('home') }}"
                    class="text-sm font-medium transition-colors
@@ -117,7 +109,6 @@
                         </a>
                     @endif
 
-                    {{-- Profile dropdown --}}
                     <div class="relative" x-data="{ openProfile:false }">
                         <button
                             @click="openProfile = !openProfile"
@@ -168,8 +159,6 @@
                     </a>
                 @endguest
             </div>
-
-            {{-- Mobile toggle --}}
             <button
                 class="inline-flex items-center justify-center rounded-md p-1.5 text-slate-600 md:hidden"
                 @click="open = !open"
@@ -179,7 +168,6 @@
             </button>
         </div>
 
-        {{-- Mobile menu --}}
         <div
             class="md:hidden"
             x-cloak
@@ -276,7 +264,6 @@
     </nav>
 </header>
 
-{{-- MAIN CONTENT --}}
 <main class="flex-1 py-4" data-aos="fade-up" data-aos-duration="600" data-aos-easing="ease-out-cubic">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         @yield('content')
@@ -290,22 +277,18 @@
     </div>
 </footer>
 
-{{-- SweetAlert2 --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-{{-- AOS JS --}}
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Init AOS
         AOS.init({
             once: true,
             duration: 600,
             easing: 'ease-out-cubic'
         });
 
-        // Konfigurasi toast snackbar di kanan atas
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',

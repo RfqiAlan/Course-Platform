@@ -137,13 +137,10 @@
     $user = auth()->user();
 @endphp
 
-{{-- NAVBAR --}}
 <nav class="navbar navbar-expand-lg navbar-glass sticky-top py-3" data-aos="fade-down" data-aos-duration="600">
     <div class="container">
         
-        {{-- LOGO --}}
         <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
-            {{-- Pastikan path logo benar --}}
             <img src="{{ asset('logo/logo.jpeg') }}" alt="EDVO" style="height: 45px; width: auto; border-radius: 10px;">
         </a>
 
@@ -154,7 +151,6 @@
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto align-items-lg-center gap-1 gap-lg-2 mt-3 mt-lg-0">
 
-                {{-- Link: Beranda --}}
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs(['home', 'dashboard', '*.dashboard']) ? 'active' : '' }}" 
                        href="{{ $user ? route('dashboard') : route('home') }}">
@@ -162,7 +158,6 @@
                     </a>
                 </li>
 
-                {{-- Link: Kursus Public --}}
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('courses.*') ? 'active' : '' }}" 
                        href="{{ route('courses.index') }}">
@@ -171,9 +166,7 @@
                 </li>
 
                 @auth
-                    {{-- DROPDOWN MENU BERDASARKAN ROLE --}}
                     
-                    {{-- 1. ADMIN MENU --}}
                     @if($user->isAdmin())
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle px-3 {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="#" data-bs-toggle="dropdown">
@@ -205,7 +198,6 @@
                         </li>
                     @endif
 
-                    {{-- 2. TEACHER MENU --}}
                     @if($user->isTeacher())
                         <li class="nav-item">
                             <a class="nav-link px-3 {{ request()->routeIs('teacher.courses.*') ? 'active' : '' }}" 
@@ -215,7 +207,6 @@
                         </li>
                     @endif
 
-                    {{-- 3. STUDENT MENU --}}
                     @if($user->isStudent())
                         <li class="nav-item">
                             <a class="nav-link px-3 {{ request()->routeIs('student.courses.*') ? 'active' : '' }}" 
@@ -225,7 +216,6 @@
                         </li>
                     @endif
 
-                    {{-- USER PROFILE DROPDOWN --}}
                     <li class="nav-item dropdown ms-lg-2 ps-lg-3 border-start-lg">
                         <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 p-0" href="#" data-bs-toggle="dropdown">
                             <div class="text-end d-none d-lg-block lh-1">
@@ -237,7 +227,6 @@
                             </div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            {{-- Info Mobile Only --}}
                             <li class="d-lg-none px-3 py-2 bg-light rounded-top mb-1">
                                 <div class="fw-bold text-dark">{{ $user->name }}</div>
                                 <div class="small text-muted">{{ $user->email }}</div>
@@ -261,7 +250,6 @@
                     </li>
 
                 @else
-                    {{-- GUEST BUTTONS --}}
                     <div class="d-flex gap-2 ms-lg-3 mt-3 mt-lg-0">
                         <li class="nav-item">
                             <a href="{{ route('login') }}" class="btn btn-light fw-semibold px-4 rounded-pill border">
@@ -281,12 +269,10 @@
     </div>
 </nav>
 
-{{-- CONTENT --}}
 <main class="flex-grow-1 py-4" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
     {{ $slot }}
 </main>
 
-{{-- FOOTER --}}
 <footer class="py-4 mt-auto">
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
@@ -303,15 +289,12 @@
         </div>
     </div>
 </footer>
-
-{{-- SCRIPTS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Init AOS with slightly better settings
         AOS.init({
             once: true,
             offset: 50,
@@ -319,7 +302,6 @@
             easing: 'ease-out-cubic',
         });
 
-        // SweetAlert Toast Configuration
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -338,7 +320,6 @@
             }
         });
 
-        // Flash Messages Logic
         @if(session('success'))
             Toast.fire({ icon: 'success', title: "{{ session('success') }}" });
         @endif
