@@ -43,7 +43,7 @@ class CourseController extends Controller
 
         $data['teacher_id'] = $request->user()->id;
         $data['slug'] = \Str::slug($data['title']) . '-' . uniqid();
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->has('is_active');
 
         Course::create($data);
 
@@ -105,7 +105,7 @@ class CourseController extends Controller
             'is_active'   => 'nullable|boolean',
         ]);
 
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->has('is_active');
 
         $course->update($data);
 

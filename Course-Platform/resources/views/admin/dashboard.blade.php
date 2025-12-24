@@ -1,232 +1,175 @@
-<x-app-layout title="Dashboard Admin – EDVO">
+<x-admin-layout title="Dashboard">
     @push('styles')
         <style>
-            .admin-hero-card {
-                background: radial-gradient(circle at top left, #1d4ed8 0, #0F3D73 38%, #020617 100%);
-                border-radius: 1.5rem;
-                color: #e5e7eb;
-                box-shadow: 0 22px 55px rgba(15, 23, 42, 0.65);
-                position: relative;
-                overflow: hidden;
-            }
-            .admin-hero-card::after {
-                content: "";
-                position: absolute;
-                inset: auto -40px -80px auto;
-                width: 260px;
-                height: 260px;
-                background: radial-gradient(circle, rgba(59,130,246,0.36), transparent 60%);
-                opacity: .9;
-            }
-
-            .admin-hero-badge {
-                font-size: .7rem;
-                text-transform: uppercase;
-                letter-spacing: .16em;
-                border-radius: 999px;
-                padding: .25rem .9rem;
-                background: rgba(15, 23, 42, 0.4);
-                border: 1px solid rgba(148, 163, 184, 0.6);
-                color: #e5e7eb;
-            }
-            .admin-hero-title {
-                font-size: 1.5rem;
-                font-weight: 700;
-            }
-            @media (min-width: 992px) {
-                .admin-hero-title {
-                    font-size: 1.8rem;
-                }
-            }
-
             .stat-card {
-                border-radius: 1.1rem;
+                border-radius: 1rem;
                 border: none;
-                box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+                box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
                 overflow: hidden;
                 position: relative;
+                transition: all 0.2s ease;
             }
-            .stat-card::before {
-                content: "";
-                position: absolute;
-                inset: 0;
-                opacity: 0;
-                background: linear-gradient(135deg, rgba(15,61,115,.08), transparent);
-                transition: opacity .2s ease;
-            }
-            .stat-card:hover::before {
-                opacity: 1;
+            .stat-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
             }
 
             .stat-icon {
-                width: 40px;
-                height: 40px;
-                border-radius: 999px;
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                background: rgba(15,61,115,0.06);
-                color: #0F3D73;
+                font-size: 1.25rem;
             }
 
-            .mini-chip {
-                font-size: .7rem;
-                border-radius: 999px;
-                padding: .15rem .5rem;
-                background: #f3f4ff;
-                color: #4b5563;
+            .stat-icon.blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+            .stat-icon.green { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+            .stat-icon.purple { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+            .stat-icon.orange { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+
+            .welcome-card {
+                background: linear-gradient(135deg, #0F3D73 0%, #1e40af 100%);
+                border-radius: 1rem;
+                color: #fff;
+                position: relative;
+                overflow: hidden;
+            }
+            .welcome-card::before {
+                content: "";
+                position: absolute;
+                top: -50%;
+                right: -20%;
+                width: 300px;
+                height: 300px;
+                background: radial-gradient(circle, rgba(255,255,255,0.1), transparent 60%);
             }
 
             .table-dashboard thead th {
-                background: #f3f4ff;
+                background: #f8fafc;
                 border-bottom-width: 0;
                 font-size: .75rem;
                 text-transform: uppercase;
-                letter-spacing: .08em;
-                color: #6b7280;
+                letter-spacing: .05em;
+                color: #64748b;
+                font-weight: 600;
             }
             .table-dashboard tbody tr {
-                transition: background-color .16s ease, transform .12s ease;
+                transition: background-color .15s ease;
             }
             .table-dashboard tbody tr:hover {
-                background-color: #f9fafb;
-                transform: translateY(-1px);
-            }
-
-            .badge-pill-soft {
-                border-radius: 999px;
-                font-size: .7rem;
-                padding: .18rem .55rem;
+                background-color: #f8fafc;
             }
         </style>
     @endpush
 
-    <div class="container py-4" data-aos="fade-up" data-aos-duration="600">
-        <div class="admin-hero-card p-4 p-md-5 mb-4">
-            <div class="row align-items-center g-4 position-relative" style="z-index:1;">
+    <div data-aos="fade-up" data-aos-duration="600">
+        <!-- Welcome Card -->
+        <div class="welcome-card p-4 mb-4">
+            <div class="row align-items-center position-relative" style="z-index:1;">
                 <div class="col-lg-8">
-                    <div class="admin-hero-badge mb-3 d-inline-flex align-items-center gap-2">
-                        <i class="bi bi-shield-lock-fill"></i>
-                        <span>Dashboard Admin</span>
-                    </div>
-                    <h1 class="admin-hero-title mb-2">
-                        Halo, {{ auth()->user()->name }} 👋
-                    </h1>
-                    <p class="mb-3 small" style="max-width: 520px; opacity:.92;">
-                        Kelola course, kategori, dan pengguna dalam satu tempat.
-                        Pantau aktivitas terbaru dan pastikan semua proses belajar
-                        di EDVO berjalan dengan lancar.
+                    <h4 class="fw-bold mb-2">
+                        Selamat datang, {{ auth()->user()->name }}! 👋
+                    </h4>
+                    <p class="mb-0 small opacity-75">
+                        Kelola course, kategori, dan pengguna dalam satu tempat. Pantau aktivitas platform EDVO dengan mudah.
                     </p>
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="mini-chip">
-                            <i class="bi bi-book-half me-1"></i>
-                            {{ $totalCourses ?? 0 }} Course aktif
-                        </span>
-                        <span class="mini-chip">
-                            <i class="bi bi-people me-1"></i>
-                            {{ $totalUsers ?? 0 }} Pengguna terdaftar
-                        </span>
-                        <span class="mini-chip">
-                            <i class="bi bi-award me-1"></i>
-                            {{ $totalCertificates ?? 0 }} Sertifikat terbit
-                        </span>
-                    </div>
                 </div>
-                <div class="col-lg-4 text-lg-end">
-                    <div class="d-inline-flex flex-column gap-2 align-items-lg-end">
-                        <a href="{{ route('admin.courses.index') }}" class="btn btn-sm btn-light text-primary-emphasis">
-                            <i class="bi bi-journal-text me-1"></i> Kelola Course
-                        </a>
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-light text-white border-light">
-                            <i class="bi bi-people me-1"></i> Manajemen User
-                        </a>
-                    </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <a href="{{ route('admin.courses.create') }}" class="btn btn-light btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i> Tambah Course
+                    </a>
                 </div>
             </div>
         </div>
 
+        <!-- Stats Cards -->
         <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="card stat-card h-100" data-aos="fade-up" data-aos-duration="500" data-aos-delay="50">
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="small text-muted">Total User</span>
-                            <div class="stat-icon">
-                                <i class="bi bi-people"></i>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small mb-1">Total Pengguna</p>
+                                <h3 class="fw-bold mb-0">{{ $totalUsers ?? 0 }}</h3>
+                                <p class="text-muted small mb-0 mt-1">
+                                    {{ $totalAdmins ?? 0 }} Admin, {{ $totalTeachers ?? 0 }} Teacher, {{ $totalStudents ?? 0 }} Student
+                                </p>
+                            </div>
+                            <div class="stat-icon blue">
+                                <i class="bi bi-people-fill"></i>
                             </div>
                         </div>
-                        <p class="fs-4 fw-semibold mb-1">{{ $totalUsers ?? 0 }}</p>
-                        <p class="small text-muted mb-0">
-                            Admin: {{ $totalAdmins ?? 0 }} • Teacher: {{ $totalTeachers ?? 0 }} • Student: {{ $totalStudents ?? 0 }}
-                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-3">
-                <div class="card stat-card h-100" data-aos="fade-up" data-aos-duration="500" data-aos-delay="100">
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="small text-muted">Total Course</span>
-                            <div class="stat-icon">
-                                <i class="bi bi-journal-bookmark"></i>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small mb-1">Total Kursus</p>
+                                <h3 class="fw-bold mb-0">{{ $totalCourses ?? 0 }}</h3>
+                                <p class="text-muted small mb-0 mt-1">{{ $totalCategories ?? 0 }} Kategori</p>
+                            </div>
+                            <div class="stat-icon purple">
+                                <i class="bi bi-journal-bookmark-fill"></i>
                             </div>
                         </div>
-                        <p class="fs-4 fw-semibold mb-1">{{ $totalCourses ?? 0 }}</p>
-                        <p class="small text-muted mb-0">
-                            Kategori: {{ $totalCategories ?? 0 }}
-                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-3">
-                <div class="card stat-card h-100" data-aos="fade-up" data-aos-duration="500" data-aos-delay="150">
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="small text-muted">Enrollments</span>
-                            <div class="stat-icon">
-                                <i class="bi bi-clipboard-check"></i>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small mb-1">Enrollments</p>
+                                <h3 class="fw-bold mb-0">{{ $totalEnrollments ?? 0 }}</h3>
+                                <p class="text-muted small mb-0 mt-1">Pendaftaran aktif</p>
+                            </div>
+                            <div class="stat-icon green">
+                                <i class="bi bi-clipboard-check-fill"></i>
                             </div>
                         </div>
-                        <p class="fs-4 fw-semibold mb-1">{{ $totalEnrollments ?? 0 }}</p>
-                        <p class="small text-muted mb-0">
-                            Total pendaftaran course oleh student.
-                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-3">
-                <div class="card stat-card h-100" data-aos="fade-up" data-aos-duration="500" data-aos-delay="200">
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="small text-muted">Sertifikat Terbit</span>
-                            <div class="stat-icon">
-                                <i class="bi bi-award"></i>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small mb-1">Sertifikat</p>
+                                <h3 class="fw-bold mb-0">{{ $totalCertificates ?? 0 }}</h3>
+                                <p class="text-muted small mb-0 mt-1">Terbit</p>
+                            </div>
+                            <div class="stat-icon orange">
+                                <i class="bi bi-award-fill"></i>
                             </div>
                         </div>
-                        <p class="fs-4 fw-semibold mb-1">{{ $totalCertificates ?? 0 }}</p>
-                        <p class="small text-muted mb-0">
-                            Course yang sudah diselesaikan student.
-                        </p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row g-3">
+        <!-- Tables Section -->
+        <div class="row g-3 mt-1">
             <div class="col-lg-7">
-                <div class="card border-0 shadow-sm rounded-4 h-100"
-                     data-aos="fade-up" data-aos-duration="550" data-aos-delay="80">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h2 class="h6 mb-0">Course terbaru</h2>
-                            <a href="{{ route('admin.courses.index') }}" class="small text-decoration-none" style="color:#0F3D73;">
-                                Lihat semua &raquo;
+                <div class="card border-0 shadow-sm rounded-3 h-100">
+                    <div class="card-header bg-white border-0 py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 fw-semibold">Kursus Terbaru</h6>
+                            <a href="{{ route('admin.courses.index') }}" class="small text-decoration-none text-primary">
+                                Lihat semua <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
-
+                    </div>
+                    <div class="card-body pt-0">
                         <div class="table-responsive">
                             <table class="table table-sm align-middle mb-0 table-dashboard">
                                 <thead>
@@ -241,31 +184,28 @@
                                 @forelse($recentCourses ?? [] as $course)
                                     <tr>
                                         <td>
-                                            <div class="fw-semibold text-truncate" style="max-width:220px;">
+                                            <div class="fw-semibold text-truncate" style="max-width:200px;">
                                                 {{ $course->title }}
                                             </div>
                                             <div class="small text-muted">
-                                                <i class="bi bi-clock-history me-1"></i>
                                                 {{ $course->created_at?->diffForHumans() }}
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="badge badge-pill-soft bg-light text-muted border">
+                                            <span class="badge bg-light text-muted">
                                                 {{ $course->category->name ?? 'Umum' }}
                                             </span>
                                         </td>
                                         <td class="small">
-                                            <i class="bi bi-person-workspace me-1 text-muted"></i>
                                             {{ $course->teacher->name ?? '-' }}
                                         </td>
                                         <td class="text-end small">
-                                            <i class="bi bi-people me-1 text-muted"></i>
                                             {{ $course->students_count ?? $course->students->count() ?? 0 }}
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted py-3 small">
+                                        <td colspan="4" class="text-center text-muted py-4 small">
                                             Belum ada course yang terdaftar.
                                         </td>
                                     </tr>
@@ -278,41 +218,36 @@
             </div>
 
             <div class="col-lg-5">
-                <div class="card border-0 shadow-sm rounded-4 h-100"
-                     data-aos="fade-up" data-aos-duration="550" data-aos-delay="120">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h2 class="h6 mb-0">User terbaru</h2>
-                            <a href="{{ route('admin.users.index') }}" class="small text-decoration-none" style="color:#0F3D73;">
-                                Kelola user &raquo;
+                <div class="card border-0 shadow-sm rounded-3 h-100">
+                    <div class="card-header bg-white border-0 py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 fw-semibold">User Terbaru</h6>
+                            <a href="{{ route('admin.users.index') }}" class="small text-decoration-none text-primary">
+                                Kelola user <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
-
+                    </div>
+                    <div class="card-body pt-0">
                         <ul class="list-group list-group-flush small">
                             @forelse($recentUsers ?? [] as $user)
-                                <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div class="fw-semibold">
-                                            {{ $user->name }}
+                                <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.75rem;">
+                                            {{ strtoupper(substr($user->name, 0, 1)) }}
                                         </div>
-                                        <div class="text-muted">
-                                            <span class="badge badge-pill-soft bg-light border text-muted me-1">
+                                        <div>
+                                            <div class="fw-semibold">{{ $user->name }}</div>
+                                            <span class="badge bg-light text-muted" style="font-size: 0.65rem;">
                                                 {{ strtoupper($user->role) }}
-                                            </span>
-                                            <span class="small">
-                                                <i class="bi bi-clock me-1"></i>
-                                                {{ $user->created_at?->diffForHumans() }}
                                             </span>
                                         </div>
                                     </div>
                                     <div class="text-end">
-                                        <span class="small text-muted d-block">
-                                            {{ $user->email }}
-                                        </span>
+                                        <span class="small text-muted">{{ $user->created_at?->diffForHumans() }}</span>
                                     </div>
                                 </li>
                             @empty
-                                <li class="list-group-item px-0 text-muted text-center small">
+                                <li class="list-group-item px-0 text-muted text-center py-4 small">
                                     Belum ada user baru.
                                 </li>
                             @endforelse
@@ -322,4 +257,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-admin-layout>

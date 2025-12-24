@@ -1,5 +1,5 @@
-<x-app-layout :title="'Edit User – '.$user->name">
-    <div class="container py-4">
+<x-admin-layout :title="'Edit User: '.$user->name">
+    <div>
         <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="h5 mb-1">Edit User</h1>
@@ -87,4 +87,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-admin-layout>

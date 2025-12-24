@@ -306,30 +306,46 @@
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 3000,
+            timer: 4000,
             timerProgressBar: true,
             background: '#fff',
             color: '#1e293b',
-            iconColor: '#0F3D73',
             didOpen: (toast) => {
                 toast.addEventListener('mouseenter', Swal.stopTimer);
                 toast.addEventListener('mouseleave', Swal.resumeTimer);
             },
             customClass: {
-                popup: 'colored-toast shadow-lg rounded-4 border-0'
+                popup: 'shadow-lg border-0',
+                title: 'fs-6 fw-semibold',
+                timerProgressBar: 'bg-primary'
             }
         });
 
         @if(session('success'))
-            Toast.fire({ icon: 'success', title: "{{ session('success') }}" });
+            Toast.fire({ 
+                icon: 'success',
+                iconColor: '#22c55e',
+                title: 'Berhasil!',
+                html: '<span class="text-muted small">{{ session("success") }}</span>'
+            });
         @endif
 
         @if(session('error'))
-            Toast.fire({ icon: 'error', title: "{{ session('error') }}" });
+            Toast.fire({ 
+                icon: 'error',
+                iconColor: '#ef4444',
+                title: 'Terjadi Kesalahan',
+                html: '<span class="text-muted small">{{ session("error") }}</span>'
+            });
         @endif
 
         @if($errors->any())
-            Toast.fire({ icon: 'error', title: 'Periksa kembali inputan Anda', text: "{{ $errors->first() }}" });
+            Toast.fire({ 
+                icon: 'warning',
+                iconColor: '#f59e0b',
+                title: 'Validasi Gagal',
+                html: '<span class="text-muted small">{{ $errors->first() }}</span>'
+            });
         @endif
     });
 </script>

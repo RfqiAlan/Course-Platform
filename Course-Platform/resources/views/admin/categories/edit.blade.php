@@ -1,6 +1,5 @@
-<x-app-layout :title="'Edit Kategori – '.$category->name">
-    <div class="py-4">
-        <div class="container">
+<x-admin-layout :title="'Edit Kategori: '.$category->name">
+    <div>
 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
@@ -93,6 +92,5 @@
                 </div>
             </div>
 
-        </div>
     </div>
-</x-app-layout>
+</x-admin-layout>
