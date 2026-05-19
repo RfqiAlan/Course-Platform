@@ -154,11 +154,6 @@
                 <div class="col-lg-9 text-center">
 
                     <div class="mb-3">
-                        <div class="hero-badge">
-                            <span class="dot"></span>
-                            <span class="fw-semibold">EDVO Learning Platform</span>
-                            <span class="text-muted d-none d-sm-inline">Belajar skill tech secara terarah</span>
-                        </div>
                     </div>
 
                     <h1 class="fw-bold hero-title mb-3">

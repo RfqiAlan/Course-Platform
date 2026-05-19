@@ -2,6 +2,8 @@
 
 A comprehensive E-Learning and Course Management platform built with **Laravel 12**. This platform provides a rich set of features tailored for three primary roles: **Admin**, **Teacher**, and **Student**, making it an ideal solution for online academies, training centers, and independent instructors.
 
+![EDVO Platform Preview](Mocup.png)
+
 ## ✨ Key Features
 
 - **🛡️ Multi-Role System (RBAC)**: Dedicated dashboards and access levels for Admin, Teacher, and Student.
