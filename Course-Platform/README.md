@@ -1,113 +1,156 @@
-# 🎓 Course Platform
+<h1 align="center">🎓 EDVO — E-Learning Platform</h1>
 
-A comprehensive E-Learning and Course Management platform built with **Laravel 12**. This platform provides a rich set of features tailored for three primary roles: **Admin**, **Teacher**, and **Student**, making it an ideal solution for online academies, training centers, and independent instructors.
+<p align="center">
+  A full-stack course management platform built with <strong>Laravel 12</strong>, designed for scalable online education with multi-role access, real-time communication, and automated certificate generation.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Laravel-12-red?style=for-the-badge&logo=laravel&logoColor=white" />
+  <img src="https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white" />
+  <img src="https://img.shields.io/badge/TailwindCSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" />
+  <img src="https://img.shields.io/badge/Livewire-3.x-FB70A9?style=for-the-badge&logo=livewire&logoColor=white" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" />
+</p>
+
+<br/>
 
 ![EDVO Platform Preview](Mocup.png)
 
+---
+
+## 📖 Overview
+
+**EDVO** is a comprehensive E-Learning and Course Management System built with **Laravel 12**. The platform is tailored for three distinct user roles — **Admin**, **Teacher**, and **Student** — each with dedicated dashboards and access controls. It is designed to deliver a structured, modern, and interactive learning experience suitable for online academies, training centers, and independent instructors.
+
+---
+
 ## ✨ Key Features
 
-- **🛡️ Multi-Role System (RBAC)**: Dedicated dashboards and access levels for Admin, Teacher, and Student.
-- **📚 Course Management**: Teachers and Admins can create and manage Courses, Modules, Lessons, and Contents.
-- **📊 Progress Tracking**: Students can track their learning progress (Lesson & Course completion).
-- **💬 Interactive Communication**: 
-  - Real-time Discussions and Chat Threads.
-  - Private Messaging between users.
-- **📜 Certificate Generation**: Automatic generation of PDF certificates upon course completion (using DomPDF) with integrated QR codes for verification.
-- **🎨 Modern UI**: Built using **Tailwind CSS** and **Alpine.js** for a responsive, fast, and interactive user experience.
+| Feature | Description |
+|---|---|
+| 🛡️ **Multi-Role Access (RBAC)** | Separate dashboards and permissions for Admin, Teacher, and Student |
+| 📚 **Course Management** | Full CRUD for Courses, Modules, Lessons, and rich Content |
+| 📊 **Progress Tracking** | Automatic per-lesson and per-course completion tracking for students |
+| 💬 **Real-Time Communication** | Live chat threads, discussions, and private messaging via Laravel Reverb |
+| 📜 **Certificate Generation** | Auto-generated PDF certificates with embedded QR code verification upon course completion |
+| 🔍 **Course Discovery** | Filter courses by category, level, and instructor |
+| 🎨 **Modern Responsive UI** | Built with Tailwind CSS v4 and Alpine.js for a fast, interactive experience |
+
+---
 
 ## 🛠️ Technology Stack
 
 | Layer | Technology |
 |---|---|
-| **Backend** | [Laravel 12](https://laravel.com/) (PHP 8.2+) |
-| **Frontend** | Blade Templates, [Tailwind CSS v4](https://tailwindcss.com/), [Alpine.js](https://alpinejs.dev/) |
-| **Database** | SQLite (Default for dev) / MySQL / PostgreSQL |
-| **PDF & QR** | `barryvdh/laravel-dompdf`, `endroid/qr-code` |
-| **Realtime** | Laravel Reverb, Laravel Echo, Livewire |
-| **Asset Bundler** | Vite |
-
-## 🚀 Getting Started
-
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
-
-### Prerequisites
-
-- **PHP** >= 8.2
-- **Composer**
-- **Node.js** & **npm** (or yarn/pnpm)
-- SQLite (or any supported database)
-
-### Installation Guide
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/Course-Platform.git
-   cd Course-Platform
-   ```
-
-2. **Install PHP dependencies**
-   ```bash
-   composer install
-   ```
-
-3. **Install NPM dependencies**
-   ```bash
-   npm install
-   ```
-
-4. **Environment Setup**
-   Copy the example `.env` file and generate the application key.
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
-
-5. **Database Setup**
-   The project is configured to use `sqlite` by default. You can change this in your `.env` file if you prefer MySQL or PostgreSQL.
-   Run migrations and seed the database with default roles and users:
-   ```bash
-   php artisan migrate --seed
-   ```
-
-6. **Storage Link**
-   Create a symbolic link for the storage directory (important for uploaded files, course content, and certificates):
-   ```bash
-   php artisan storage:link
-   ```
-
-7. **Build Frontend Assets**
-   ```bash
-   npm run build
-   # Or run `npm run dev` to watch for changes during development
-   ```
-
-8. **Start the Development Server**
-   ```bash
-   php artisan serve
-   ```
-   *Your application will be available at `http://localhost:8000`.*
+| **Backend** | [Laravel 12](https://laravel.com/) · PHP 8.2+ |
+| **Frontend** | Blade Templates · [Tailwind CSS v4](https://tailwindcss.com/) · [Alpine.js](https://alpinejs.dev/) |
+| **Realtime** | [Laravel Reverb](https://reverb.laravel.com/) · Laravel Echo · [Livewire 3](https://livewire.laravel.com/) |
+| **Database** | SQLite *(default)* · MySQL · PostgreSQL |
+| **PDF & QR** | `barryvdh/laravel-dompdf` · `endroid/qr-code` |
+| **Asset Bundler** | [Vite](https://vitejs.dev/) |
 
 ---
 
-## 🔑 Default Login Credentials
+## 🚀 Getting Started
 
-After running `php artisan migrate --seed`, the following default users will be available:
+### Prerequisites
+
+Make sure you have the following installed:
+
+- **PHP** >= 8.2
+- **Composer**
+- **Node.js** & **npm**
+- SQLite, MySQL, or PostgreSQL
+
+### Installation
+
+**1. Clone the repository**
+```bash
+git clone https://github.com/RfqiAlan/Course-Platform.git
+cd Course-Platform
+```
+
+**2. Install PHP dependencies**
+```bash
+composer install
+```
+
+**3. Install Node dependencies**
+```bash
+npm install
+```
+
+**4. Configure environment**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+**5. Run database migrations & seeder**
+```bash
+php artisan migrate --seed
+```
+
+**6. Create storage symlink**
+```bash
+php artisan storage:link
+```
+
+**7. Build frontend assets**
+```bash
+npm run build
+# Use `npm run dev` during development
+```
+
+**8. Start the development server**
+```bash
+php artisan serve
+```
+
+> The application will be available at **http://localhost:8000**
+
+---
+
+## 🔑 Default Credentials
+
+After seeding the database, you can log in with the following accounts:
 
 | Role | Email | Password |
 |---|---|---|
-| **Admin** | `rifqialanm@gmail.com` | `password` |
+| **Admin** | `admin@example.com` | `password` |
 | **Teacher** | `teacher@example.com` | `password` |
 | **Student** | `student@example.com` | `password` |
 
 ---
 
-## 📁 Project Structure Highlights
+## 📁 Project Structure
 
-- `app/Http/Controllers/`: Contains role-specific controllers (`Admin/`, `Teacher/`, `Student/`).
-- `app/Models/`: Eloquent models defining relationships (`Course`, `Lesson`, `Certificate`, `ChatThread`, etc.).
-- `resources/views/`: Blade templates structured by role and feature (`admin/`, `teacher/`, `student/`, `courses/`, `certificates/`, `pdf/`).
-- `routes/web.php`: Defines the web routes, middleware, and role-based access control.
+```
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── Admin/          # Admin-specific controllers
+│   │   ├── Teacher/        # Teacher-specific controllers
+│   │   └── Student/        # Student-specific controllers
+│   └── Models/             # Eloquent models (Course, Lesson, Certificate, ChatThread, etc.)
+├── resources/
+│   └── views/              # Blade templates organized by role & feature
+│       ├── admin/
+│       ├── teacher/
+│       ├── student/
+│       ├── courses/
+│       └── certificates/
+└── routes/
+    └── web.php             # Role-based routes and middleware
+```
+
+---
 
 ## 📄 License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT). This project's specific code is subject to its respective repository's license.
+This project is open-source and available under the [MIT License](https://opensource.org/licenses/MIT).
+
+---
+
+<p align="center">
+  Built with ❤️ by <a href="https://github.com/RfqiAlan">Rifqi Alan Maulana</a>
+</p>
