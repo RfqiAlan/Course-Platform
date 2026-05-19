@@ -1,59 +1,111 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎓 Course Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive E-Learning and Course Management platform built with **Laravel 12**. This platform provides a rich set of features tailored for three primary roles: **Admin**, **Teacher**, and **Student**, making it an ideal solution for online academies, training centers, and independent instructors.
 
-## About Laravel
+## ✨ Key Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **🛡️ Multi-Role System (RBAC)**: Dedicated dashboards and access levels for Admin, Teacher, and Student.
+- **📚 Course Management**: Teachers and Admins can create and manage Courses, Modules, Lessons, and Contents.
+- **📊 Progress Tracking**: Students can track their learning progress (Lesson & Course completion).
+- **💬 Interactive Communication**: 
+  - Real-time Discussions and Chat Threads.
+  - Private Messaging between users.
+- **📜 Certificate Generation**: Automatic generation of PDF certificates upon course completion (using DomPDF) with integrated QR codes for verification.
+- **🎨 Modern UI**: Built using **Tailwind CSS** and **Alpine.js** for a responsive, fast, and interactive user experience.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Technology Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Layer | Technology |
+|---|---|
+| **Backend** | [Laravel 12](https://laravel.com/) (PHP 8.2+) |
+| **Frontend** | Blade Templates, [Tailwind CSS v4](https://tailwindcss.com/), [Alpine.js](https://alpinejs.dev/) |
+| **Database** | SQLite (Default for dev) / MySQL / PostgreSQL |
+| **PDF & QR** | `barryvdh/laravel-dompdf`, `endroid/qr-code` |
+| **Realtime** | Laravel Reverb, Laravel Echo, Livewire |
+| **Asset Bundler** | Vite |
 
-## Learning Laravel
+## 🚀 Getting Started
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Prerequisites
 
-## Laravel Sponsors
+- **PHP** >= 8.2
+- **Composer**
+- **Node.js** & **npm** (or yarn/pnpm)
+- SQLite (or any supported database)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Installation Guide
 
-### Premium Partners
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/Course-Platform.git
+   cd Course-Platform
+   ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+2. **Install PHP dependencies**
+   ```bash
+   composer install
+   ```
 
-## Contributing
+3. **Install NPM dependencies**
+   ```bash
+   npm install
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. **Environment Setup**
+   Copy the example `.env` file and generate the application key.
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## Code of Conduct
+5. **Database Setup**
+   The project is configured to use `sqlite` by default. You can change this in your `.env` file if you prefer MySQL or PostgreSQL.
+   Run migrations and seed the database with default roles and users:
+   ```bash
+   php artisan migrate --seed
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+6. **Storage Link**
+   Create a symbolic link for the storage directory (important for uploaded files, course content, and certificates):
+   ```bash
+   php artisan storage:link
+   ```
 
-## Security Vulnerabilities
+7. **Build Frontend Assets**
+   ```bash
+   npm run build
+   # Or run `npm run dev` to watch for changes during development
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+8. **Start the Development Server**
+   ```bash
+   php artisan serve
+   ```
+   *Your application will be available at `http://localhost:8000`.*
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🔑 Default Login Credentials
+
+After running `php artisan migrate --seed`, the following default users will be available:
+
+| Role | Email | Password |
+|---|---|---|
+| **Admin** | `rifqialanm@gmail.com` | `password` |
+| **Teacher** | `teacher@example.com` | `password` |
+| **Student** | `student@example.com` | `password` |
+
+---
+
+## 📁 Project Structure Highlights
+
+- `app/Http/Controllers/`: Contains role-specific controllers (`Admin/`, `Teacher/`, `Student/`).
+- `app/Models/`: Eloquent models defining relationships (`Course`, `Lesson`, `Certificate`, `ChatThread`, etc.).
+- `resources/views/`: Blade templates structured by role and feature (`admin/`, `teacher/`, `student/`, `courses/`, `certificates/`, `pdf/`).
+- `routes/web.php`: Defines the web routes, middleware, and role-based access control.
+
+## 📄 License
+
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT). This project's specific code is subject to its respective repository's license.
